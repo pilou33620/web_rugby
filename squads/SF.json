@@ -1,0 +1,188 @@
+{
+ "id": "SF",
+ "sources": [
+  "https://www.rugbypass.com/fr/news/stade-francais-top-14-2026-2027/"
+ ],
+ "joueurs": [
+  {
+   "nom": "Moses Alo-Emile",
+   "poste": 1,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Thierry Paiva",
+   "poste": 1,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Giacomo Nicotera",
+   "poste": 2,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Lucas Peyresblanques",
+   "poste": 2,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Paul Alo-Emile",
+   "poste": 3,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Giorgi Melikidze",
+   "poste": 3,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Paul Gabrillagues",
+   "poste": 4,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Pierre-Henri Azagoh",
+   "poste": 4,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Setareki Turagacoke",
+   "poste": 5,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Jacques Botha",
+   "poste": 5,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Sekou Macalou",
+   "poste": 6,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Yoan Tanga",
+   "poste": 6,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Ryan Chapuis",
+   "poste": 7,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Romain Briatte",
+   "poste": 7,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Tanginoa Halaifonua",
+   "poste": 8,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Mathieu Hirigoyen",
+   "poste": 8,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Tawera Kerr-Barlow",
+   "poste": 9,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Paul Abadie",
+   "poste": 9,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Louis Carbonel",
+   "poste": 10,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Ihaia West",
+   "poste": 10,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Peniasi Dakuwaqa",
+   "poste": 11,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Rufus McLean",
+   "poste": 11,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Tani Vili",
+   "poste": 12,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Jeremy Ward",
+   "poste": 12,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Alivereti Duguivalu",
+   "poste": 13,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Julien Delbouis",
+   "poste": 13,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Lester Etien",
+   "poste": 14,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Samuel Ezeala",
+   "poste": 14,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Léo Barré",
+   "poste": 15,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Mathis Ibo",
+   "poste": 15,
+   "titulaire": false,
+   "international": false
+  }
+ ]
+}

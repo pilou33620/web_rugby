@@ -1,0 +1,190 @@
+{
+ "id": "LOU",
+ "sources": [
+  "https://www.rugbypass.com/fr/news/lou-rugby-top-14-2026-2027/",
+  "https://www.rugbypass.com/news/lou-debut-de-saison-2026-2027/",
+  "https://info.fr/mercato-lou-premiere-ligne-renforcee-questions-troisieme-ligne-arriere/"
+ ],
+ "joueurs": [
+  {
+   "nom": "Thomas Gallo",
+   "poste": 1,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Jérôme Rey",
+   "poste": 1,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Camille Chat",
+   "poste": 2,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Guillaume Marchand",
+   "poste": 2,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Tim Hoyt",
+   "poste": 3,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Irakli Aptsiauri",
+   "poste": 3,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Mickaël Guillard",
+   "poste": 4,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Bartholomé Sanson",
+   "poste": 4,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Janse Roux",
+   "poste": 5,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Félix Lambey",
+   "poste": 5,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Beka Saginadze",
+   "poste": 6,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Beka Shvangiradze",
+   "poste": 6,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Dylan Cretin",
+   "poste": 7,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Antoine Deliance",
+   "poste": 7,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Sam Simmonds",
+   "poste": 8,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Maxime Gouzou",
+   "poste": 8,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Baptiste Couilloud",
+   "poste": 9,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Sanele Nohamba",
+   "poste": 9,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Léo Berdeu",
+   "poste": 10,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Paddy Jackson",
+   "poste": 10,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Jiuta Wainiqolo",
+   "poste": 11,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Ethan Dumortier",
+   "poste": 11,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Josiah Maraku",
+   "poste": 12,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Thibaut Regard",
+   "poste": 12,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Iosefo Masi",
+   "poste": 13,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Adrien Séguret",
+   "poste": 13,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Monty Ioane",
+   "poste": 14,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Arthur Mathiron",
+   "poste": 14,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Gabin Lorre",
+   "poste": 15,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Alexandre Tchaptchet",
+   "poste": 15,
+   "titulaire": false,
+   "international": false
+  }
+ ]
+}

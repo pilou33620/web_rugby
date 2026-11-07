@@ -1,0 +1,191 @@
+{
+ "id": "USAP",
+ "sources": [
+  "https://www.rugbypass.com/news/usap-top-14-2026-2027/",
+  "https://info.fr/usap-recrutement-internationaux-top-14-2026-2027-perpignan/",
+  "https://www.sudradio.fr/sport-rugby/rugby/perpignan-veut-enfin-sortir-de-la-zone-rouge",
+  "https://www.rugbypass.com/fr/news/top-14-2026-2027-journee-5-resultats-stats/"
+ ],
+ "joueurs": [
+  {
+   "nom": "Giorgi Tetrashvili",
+   "poste": 1,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Bruce Devaux",
+   "poste": 1,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Ignacio Ruiz",
+   "poste": 2,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Mathys Lotrian",
+   "poste": 2,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Marco Riccioni",
+   "poste": 3,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Pietro Ceccarelli",
+   "poste": 3,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Posolo Tuilagi",
+   "poste": 4,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Mathieu Tanguy",
+   "poste": 4,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Jonny Gray",
+   "poste": 5,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Adrien Warion",
+   "poste": 5,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Lachlan Swinton",
+   "poste": 6,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Mattéo Le Corvec",
+   "poste": 6,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Patrick Sobela",
+   "poste": 7,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Jacobus Van Tonder",
+   "poste": 7,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Joaquin Oviedo",
+   "poste": 8,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Peceli Yato",
+   "poste": 8,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Luke McGrath",
+   "poste": 9,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Tom Ecochard",
+   "poste": 9,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Paolo Garbisi",
+   "poste": 10,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Benjamin Urdapilleta",
+   "poste": 10,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Lucas Dubois",
+   "poste": 11,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Antoine Aucagne",
+   "poste": 11,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Jeronimo De la Fuente",
+   "poste": 12,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Diego Mascarenc",
+   "poste": 12,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Braydon Ennor",
+   "poste": 13,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Riko Buliruarua",
+   "poste": 13,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Sevu Reece",
+   "poste": 14,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Jefferson-Lee Joseph",
+   "poste": 14,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Théo Forner",
+   "poste": 15,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Tristan Tedder",
+   "poste": 15,
+   "titulaire": false,
+   "international": false
+  }
+ ]
+}

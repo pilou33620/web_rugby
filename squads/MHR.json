@@ -1,0 +1,190 @@
+{
+ "id": "MHR",
+ "sources": [
+  "https://www.rugbypass.com/news/montpellier-top-14-2026-2027/",
+  "https://www.sudradio.fr/sport-rugby/rugby/montpellier-veut-confirmer-et-viser-le-titre",
+  "https://info.fr/top-14-montpellier-composition-finale-toulouse/"
+ ],
+ "joueurs": [
+  {
+   "nom": "Reda Wardi",
+   "poste": 1,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Baptiste Erdocio",
+   "poste": 1,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Christopher Tolofua",
+   "poste": 2,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Ricky Riccitelli",
+   "poste": 2,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Mohamed Haouas",
+   "poste": 3,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Wilfrid Hounkpatin",
+   "poste": 3,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Adam Beard",
+   "poste": 4,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Bastien Chalureau",
+   "poste": 4,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Florian Verhaeghe",
+   "poste": 5,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Ruben van Heerden",
+   "poste": 5,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Lenni Nouchi",
+   "poste": 6,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Alexandre Bécognée",
+   "poste": 6,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Yacouba Camara",
+   "poste": 7,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Langi Gleeson",
+   "poste": 7,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Billy Vunipola",
+   "poste": 8,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Alex Masibaka",
+   "poste": 8,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Ali Price",
+   "poste": 9,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Sébastien Bézy",
+   "poste": 9,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Domingo Miotti",
+   "poste": 10,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Adam Hastings",
+   "poste": 10,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Dimitri Delibes",
+   "poste": 11,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Donovan Taofifenua",
+   "poste": 11,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Auguste Cadot",
+   "poste": 12,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Lennox Anyanwu",
+   "poste": 12,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Arthur Vincent",
+   "poste": 13,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Justo Piccardo",
+   "poste": 13,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Jon Echegaray",
+   "poste": 14,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Melvyn Rates",
+   "poste": 14,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Tom Banks",
+   "poste": 15,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Stuart Hogg",
+   "poste": 15,
+   "titulaire": false,
+   "international": false
+  }
+ ]
+}

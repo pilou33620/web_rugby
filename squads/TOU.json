@@ -1,0 +1,190 @@
+{
+ "id": "TOU",
+ "sources": [
+  "https://www.rugbypass.com/news/stade-toulousain-top-14-2026-2027/",
+  "https://www.rugbypass.com/news/rotation-stade-toulousain-castres-journee-5-top-14/",
+  "https://www.sudradio.fr/sport-rugby/rugby/toulouse-veut-poursuivre-sa-domination"
+ ],
+ "joueurs": [
+  {
+   "nom": "Cyril Baille",
+   "poste": 1,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Rodrigue Neti",
+   "poste": 1,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Peato Mauvaka",
+   "poste": 2,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Julien Marchand",
+   "poste": 2,
+   "titulaire": false,
+   "international": true
+  },
+  {
+   "nom": "Dorian Aldegheri",
+   "poste": 3,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Joel Merkler",
+   "poste": 3,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Emmanuel Meafou",
+   "poste": 4,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Joshua Brennan",
+   "poste": 4,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Thibaud Flament",
+   "poste": 5,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Clément Vergé",
+   "poste": 5,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "François Cros",
+   "poste": 6,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Anthony Jelonch",
+   "poste": 6,
+   "titulaire": false,
+   "international": true
+  },
+  {
+   "nom": "Jack Willis",
+   "poste": 7,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Léo Banos",
+   "poste": 7,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Alexandre Roumat",
+   "poste": 8,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Théo Ntamack",
+   "poste": 8,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Antoine Dupont",
+   "poste": 9,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Paul Graou",
+   "poste": 9,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Romain Ntamack",
+   "poste": 10,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Valentin Delpy",
+   "poste": 10,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Blair Kinghorn",
+   "poste": 11,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Matthis Lebel",
+   "poste": 11,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Tommaso Menoncello",
+   "poste": 12,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Pierre-Louis Barassi",
+   "poste": 12,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Santiago Chocobares",
+   "poste": 13,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Kalvin Gourgues",
+   "poste": 13,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Juan Cruz Mallia",
+   "poste": 14,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Teddy Thomas",
+   "poste": 14,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Thomas Ramos",
+   "poste": 15,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Ange Capuozzo",
+   "poste": 15,
+   "titulaire": false,
+   "international": true
+  }
+ ]
+}

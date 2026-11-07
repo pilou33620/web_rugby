@@ -1,0 +1,190 @@
+{
+ "id": "CO",
+ "sources": [
+  "https://www.rugbypass.com/fr/news/castres-top-14-2026-2027/",
+  "https://sports.orange.fr/rugby/top-14/article/top-14-j5-toulouse-s-impose-de-peu-a-castres-exclu-CNT000002siLxT.html",
+  "https://sports.orange.fr/rugby/top-14/article/top-14-graou-kouassi-le-brun-les-tops-flops-de-castres-toulouse-exclu-CNT000002siLXk.html"
+ ],
+ "joueurs": [
+  {
+   "nom": "Quentin Walcker",
+   "poste": 1,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Nicolas Corato",
+   "poste": 1,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Pierre Colonna",
+   "poste": 2,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Loris Zarantonello",
+   "poste": 2,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Will Collier",
+   "poste": 3,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Levan Chilachava",
+   "poste": 3,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Tom Staniforth",
+   "poste": 4,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Guillaume Ducat",
+   "poste": 4,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Florent Vanverberghe",
+   "poste": 5,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Paul Jedrasiak",
+   "poste": 5,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Mathieu Babillot",
+   "poste": 6,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Baptiste Delaporte",
+   "poste": 6,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Hamish Watson",
+   "poste": 7,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Kyllian Ringuet",
+   "poste": 7,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Abraham Papali'i",
+   "poste": 8,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Feibyan Tukino",
+   "poste": 8,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Santiago Arata",
+   "poste": 9,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Jérémy Fernandez",
+   "poste": 9,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Louis Le Brun",
+   "poste": 10,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Théo Vidal",
+   "poste": 10,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Christian Ambadiang",
+   "poste": 11,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Adam Vargas",
+   "poste": 11,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Jack Goodhue",
+   "poste": 12,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Taylor Gontineac",
+   "poste": 12,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Vilimoni Botitu",
+   "poste": 13,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Adrea Cocagi",
+   "poste": 13,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Vuate Karawalevu",
+   "poste": 14,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Rémy Baget",
+   "poste": 14,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Geoffrey Palis",
+   "poste": 15,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Théo Chabouni",
+   "poste": 15,
+   "titulaire": false,
+   "international": false
+  }
+ ]
+}

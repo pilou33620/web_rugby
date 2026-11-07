@@ -1,0 +1,190 @@
+{
+ "id": "SR",
+ "sources": [
+  "https://www.rugbypass.com/news/stade-rochelais-top-14-2026-2027/",
+  "https://www.rugbypass.com/news/les-compos-de-la-3e-journee-de-top-14-en-un-coup-doeil-2/",
+  "https://www.rugbypass.com/news/les-compos-de-la-6e-journee-de-top-14-en-un-coup-doeil-2/"
+ ],
+ "joueurs": [
+  {
+   "nom": "Louis Penverne",
+   "poste": 1,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Sione Ahio",
+   "poste": 1,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Pierre Bourgarit",
+   "poste": 2,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Quentin Lespiaucq-Brettes",
+   "poste": 2,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Aleksandre Kuntelia",
+   "poste": 3,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Nathan Fraissenon",
+   "poste": 3,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Will Skelton",
+   "poste": 4,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Thomas Lavault",
+   "poste": 4,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Salmaan Moerat",
+   "poste": 5,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Igor Gatteau",
+   "poste": 5,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Oscar Jegou",
+   "poste": 6,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Matthias Haddad",
+   "poste": 6,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Paul Boudehent",
+   "poste": 7,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Levani Botia",
+   "poste": 7,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Grégory Alldritt",
+   "poste": 8,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Theo McFarland",
+   "poste": 8,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Nolann Le Garrec",
+   "poste": 9,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Nolhann Couillaud",
+   "poste": 9,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Antoine Hastoy",
+   "poste": 10,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Ben Healy",
+   "poste": 10,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Dillyn Leyds",
+   "poste": 11,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Nathan Bollengier",
+   "poste": 11,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Jonathan Danty",
+   "poste": 12,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Ulupano Seuteni",
+   "poste": 12,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "David Kriel",
+   "poste": 13,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Jules Favre",
+   "poste": 13,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Jack Nowell",
+   "poste": 14,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Hoani Bosmorin",
+   "poste": 14,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Davit Niniashvili",
+   "poste": 15,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Ugo Pacome",
+   "poste": 15,
+   "titulaire": false,
+   "international": false
+  }
+ ]
+}
