@@ -1,0 +1,188 @@
+{
+ "id": "R92",
+ "sources": [
+  "https://www.rugbypass.com/fr/news/racing-92-top-14-2026-2027/"
+ ],
+ "joueurs": [
+  {
+   "nom": "Hassane Kolingar",
+   "poste": 1,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Gia Kharaishvili",
+   "poste": 1,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Diego Escobar",
+   "poste": 2,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Janick Tarrit",
+   "poste": 2,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Taniela Tupou",
+   "poste": 3,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Demba Bamba",
+   "poste": 3,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Romain Taofifenua",
+   "poste": 4,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Thomas Lainault",
+   "poste": 4,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Jonathan Hill",
+   "poste": 5,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Serupepeli Uru",
+   "poste": 5,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Ibrahim Diallo",
+   "poste": 6,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Maxime Baudonne",
+   "poste": 6,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Lekima Tagitagivalu",
+   "poste": 7,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Fabien Sanconnie",
+   "poste": 7,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Jordan Joseph",
+   "poste": 8,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Nathan Hughes",
+   "poste": 8,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Léo Carbonneau",
+   "poste": 9,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Maxime Machenaud",
+   "poste": 9,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Geronimo Prisciantelli",
+   "poste": 10,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Antoine Gibert",
+   "poste": 10,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Vinaya Habosi",
+   "poste": 11,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Wame Naituvi",
+   "poste": 11,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Josua Tuisova",
+   "poste": 12,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Joseph Manu",
+   "poste": 12,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Paul Costes",
+   "poste": 13,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Sam James",
+   "poste": 13,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Selestino Ravutaumada",
+   "poste": 14,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Josaia Ralulu",
+   "poste": 14,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Max Spring",
+   "poste": 15,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Wilfried Hulleu",
+   "poste": 15,
+   "titulaire": false,
+   "international": false
+  }
+ ]
+}

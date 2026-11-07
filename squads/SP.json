@@ -1,0 +1,188 @@
+{
+ "id": "SP",
+ "sources": [
+  "https://www.rugbypass.com/fr/news/section-paloise-top-14-2026-2027/"
+ ],
+ "joueurs": [
+  {
+   "nom": "Daniel Bibi-Biziwu",
+   "poste": 1,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Lekso Kaulashvili",
+   "poste": 1,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Julian Montoya",
+   "poste": 2,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Youri Delhommel",
+   "poste": 2,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Siate Tokolahi",
+   "poste": 3,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Guram Papidze",
+   "poste": 3,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Hugo Auradou",
+   "poste": 4,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Thomas Jolmes",
+   "poste": 4,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Rémi Picquette",
+   "poste": 5,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Baptiste Pesenti",
+   "poste": 5,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Bastien Vergnes-Taillefer",
+   "poste": 6,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Reece Hewat",
+   "poste": 6,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Santiago Grondona",
+   "poste": 7,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Beka Gorgadze",
+   "poste": 7,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Facundo Isa",
+   "poste": 8,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Xander Iosefo",
+   "poste": 8,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Thibault Daubagna",
+   "poste": 9,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Gonzalo Garcia",
+   "poste": 9,
+   "titulaire": false,
+   "international": true
+  },
+  {
+   "nom": "Joe Simmonds",
+   "poste": 10,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Axel Desperes",
+   "poste": 10,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Théo Attissogbe",
+   "poste": 11,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Rodrigo Marta",
+   "poste": 11,
+   "titulaire": false,
+   "international": true
+  },
+  {
+   "nom": "Fabien Brau-Boirie",
+   "poste": 12,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Tumua Manu",
+   "poste": 12,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Emilien Gailleton",
+   "poste": 13,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Nathan Decron",
+   "poste": 13,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Aaron Grandidier-Nkanang",
+   "poste": 14,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Joachim Senga Kouo",
+   "poste": 14,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Jack Maddocks",
+   "poste": 15,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Clément Laporte",
+   "poste": 15,
+   "titulaire": false,
+   "international": false
+  }
+ ]
+}

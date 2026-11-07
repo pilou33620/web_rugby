@@ -1,0 +1,189 @@
+{
+ "id": "UBB",
+ "sources": [
+  "https://www.rugbypass.com/news/ubb-top-14-2026-2027/",
+  "https://www.sudradio.fr/sport-rugby/rugby/bordeaux-begles-veut-rebondir-et-viser-le-titre"
+ ],
+ "joueurs": [
+  {
+   "nom": "Jefferson Poirot",
+   "poste": 1,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Matis Perchaud",
+   "poste": 1,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Gaëtan Barlot",
+   "poste": 2,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Maxime Lamothe",
+   "poste": 2,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Ben Tameifuna",
+   "poste": 3,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Sipili Falatea",
+   "poste": 3,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Adam Coleman",
+   "poste": 4,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Alex Moon",
+   "poste": 4,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Cyril Cazeaux",
+   "poste": 5,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Boris Palu",
+   "poste": 5,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Cameron Woki",
+   "poste": 6,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Pierre Bochaton",
+   "poste": 6,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Temo Matiu",
+   "poste": 7,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Jean-Luc Du Preez",
+   "poste": 7,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Tom Willis",
+   "poste": 8,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Marko Gazzotti",
+   "poste": 8,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Maxime Lucu",
+   "poste": 9,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Martin Page-Relo",
+   "poste": 9,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Matthieu Jalibert",
+   "poste": 10,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Hugo Reus",
+   "poste": 10,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Louis Bielle-Biarrey",
+   "poste": 11,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Arthur Retière",
+   "poste": 11,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Yoram Moefana",
+   "poste": 12,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Dan Du Plessis",
+   "poste": 12,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Nicolas Depoortere",
+   "poste": 13,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Pablo Uberti",
+   "poste": 13,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Damian Penaud",
+   "poste": 14,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Salesi Rayasi",
+   "poste": 14,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Romain Buros",
+   "poste": 15,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Hugo Avogadro",
+   "poste": 15,
+   "titulaire": false,
+   "international": false
+  }
+ ]
+}

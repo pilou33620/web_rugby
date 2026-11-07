@@ -1,0 +1,190 @@
+{
+ "id": "RCT",
+ "sources": [
+  "https://www.rugbypass.com/news/toulon-top-14-2026-2027/",
+  "https://www.rugbypass.com/news/top-14-2026-2027-les-compos-de-la-2e-journee-en-un-coup-doeil/",
+  "https://www.rugbypass.com/news/les-compos-de-la-4e-journee-de-top-14-en-un-coup-doeil-2/"
+ ],
+ "joueurs": [
+  {
+   "nom": "Jean-Baptiste Gros",
+   "poste": 1,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Dany Priso",
+   "poste": 1,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Gianmarco Lucchesi",
+   "poste": 2,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Teddy Baubigny",
+   "poste": 2,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Kyle Sinckler",
+   "poste": 3,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Beka Gigashvili",
+   "poste": 3,
+   "titulaire": false,
+   "international": true
+  },
+  {
+   "nom": "David Ribbans",
+   "poste": 4,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Matthias Halagahu",
+   "poste": 4,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Judicaël Cancoriet",
+   "poste": 5,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Swan Rebbadj",
+   "poste": 5,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Charles Ollivon",
+   "poste": 6,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Esteban Abadie",
+   "poste": 6,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Lewis Ludlam",
+   "poste": 7,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Junior Kpoku",
+   "poste": 7,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Zach Mercer",
+   "poste": 8,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Mikheili Shioshvili",
+   "poste": 8,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Ben White",
+   "poste": 9,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Baptiste Serin",
+   "poste": 9,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Tomas Albornoz",
+   "poste": 10,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Mateo Garcia",
+   "poste": 10,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Gabin Villière",
+   "poste": 11,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Setariki Tuicuvu",
+   "poste": 11,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Gaël Fickou",
+   "poste": 12,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Jérémy Sinzelle",
+   "poste": 12,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Huw Jones",
+   "poste": 13,
+   "titulaire": true,
+   "international": true
+  },
+  {
+   "nom": "Antoine Frisch",
+   "poste": 13,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Gaël Dréan",
+   "poste": 14,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Mathis Ferté",
+   "poste": 14,
+   "titulaire": false,
+   "international": false
+  },
+  {
+   "nom": "Melvyn Jaminet",
+   "poste": 15,
+   "titulaire": true,
+   "international": false
+  },
+  {
+   "nom": "Rayan Rebbadj",
+   "poste": 15,
+   "titulaire": false,
+   "international": false
+  }
+ ]
+}
