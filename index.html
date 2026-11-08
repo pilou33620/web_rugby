@@ -169,6 +169,7 @@ details summary{cursor:pointer;color:var(--mut);font-size:12.5px}
         <select id="selWx" aria-label="Météo"></select>
         <button class="btn tog on" id="btnSnd" title="Son du stade">🔊 Son</button>
         <button class="btn tog on" id="btnVoice" title="Voix du commentateur">🎙️ Commentaire</button>
+        <button class="btn tog on" id="btnRuns" title="Afficher les courses de tous les joueurs">🧭 Courses</button>
       </div>
       <div class="seg" id="speed"><button data-s="0.5">×½</button><button data-s="1" class="on">×1</button><button data-s="2">×2</button><button data-s="4">×4</button><button data-s="12">⏭</button></div>
     </div>
@@ -333,12 +334,34 @@ function ctxLabel(ctx){
   return {icon, wl};
 }
 
+// ---------- Livre de combinaisons ----------
+// Points de passage [profondeur derrière le point de départ, décalage côté ouvert] ; « BW » = ailier du côté fermé.
+// steps : passes enchaînées (de, vers, après n instants) ; fin : joueur qui doit percer ; vs : efficacité selon la défense adverse.
+const COMBOS = {
+  croisee:   {nom:'Croisée 10-12', first:10, steps:[{from:10, to:12, after:1}], fin:12, ctx:['ruck','scrum','lineout'],
+              paths:{10:[[1.8,3.5],[1.5,5.5],[1.3,6.5]], 12:[[2.4,7.5],[1.6,5],[.8,3.5],[0,3]], 13:[[2.6,9.5],[2,10.5]]}, vs:{GL:.1, IN:-.05, GR:0}},
+  redouble:  {nom:'Redoublement 10-12', first:10, steps:[{from:10, to:12, after:1}, {from:12, to:10, after:2}], fin:10, ctx:['ruck','scrum','lineout'],
+              paths:{10:[[1.8,3.2],[2.6,5.2],[2.2,8],[1.2,9.5],[.4,10.5]], 12:[[2.2,5.8],[1.4,6.3]], 13:[[2.6,9.5],[1.8,11.5]]}, vs:{GL:-.05, IN:-.1, GR:.05}},
+  intrusion: {nom:"Intrusion de l'arrière", first:10, steps:[{from:10, to:12, after:1}, {from:12, to:15, after:2}], fin:15, ctx:['ruck','scrum','lineout'],
+              paths:{15:[[4,5],[2.8,6.8],[1.6,8],[.6,8.8],[-.4,9.4]], 12:[[2.2,6],[1.8,7]], 13:[[2.6,10.5],[2.2,12]]}, vs:{GL:.05, IN:.05, GR:0}},
+  ailier:    {nom:'Ailier qui rentre', first:'BW', steps:[], fin:'BW', ctx:['ruck','scrum'],
+              paths:{BW:[[2.2,-2.5],[1.6,0],[.8,1.8],[0,2.8],[-1,3.4]]}, vs:{GL:.1, IN:-.05, GR:0}},
+  leurre:    {nom:'Leurre du 12, passe au 13', first:10, steps:[{from:10, to:13, after:1}], fin:13, ctx:['ruck','scrum','lineout'],
+              paths:{10:[[1.8,3.5],[1.6,4.5]], 12:[[1,5],[.2,5.5],[-.6,5.8]], 13:[[2.6,8],[1.8,8.6],[1,9.2],[0,9.8]]}, vs:{GL:-.05, IN:.12, GR:0}},
+  n8:        {nom:'Départ du n°8', first:8, steps:[{from:8, to:9, after:1}], fin:9, ctx:['scrum'],
+              paths:{8:[[1.8,-1],[.6,-2],[-.6,-2.6]], 9:[[2.4,-1.5],[1.4,-2.8],[.2,-3.8]]}, vs:{GL:.05, IN:0, GR:-.05}},
+  porteSim:  {nom:'Ballon porté simulé, jeu au large', first:10, steps:[{from:10, to:12, after:1}, {from:12, to:13, after:1}], fin:13, ctx:['lineout'], pack:true,
+              paths:{12:[[2.2,6],[1.8,7]], 13:[[2.6,9],[1.8,10.5],[1,11.5]]}, vs:{GL:.05, IN:.08, GR:.05}}
+};
+const COMBO_KEYS = Object.keys(COMBOS);
+function freshComboQ(c){ const q = {}; COMBO_KEYS.forEach(k => q[k] = .2); if(c.style === 'LA' || c.style === 'MO'){ q.redouble += .1; q.intrusion += .1; } if(c.style === 'AV'){ q.n8 += .15; q.porteSim += .1; } return q; }
+
 // ---------- Mémoire persistante (expérience, apprentissage, classement) ----------
 const LS_KEY = 'rugbyHexSim_v1';
 function freshTeam(c){
   const atk = ZONES.map((_, z) => { const q = {AV:.2, LA:.2, PI:.2, MO:.2}; q[c.style] += .3; if(z === 0) q.PI += .15; if(z === 3) q.AV += .1; return q; });
   const def = ZONES.map(() => { const q = {GL:-.3, IN:-.3, GR:-.3}; q[c.dstyle] += .15; return q; });
-  return {bonus:Object.fromEntries(STAT_KEYS.map(k => [k, 0])), xp:0, Q:{atk, def}, career:{J:0,G:0,N:0,P:0}, rec:newRec(), form:[]};
+  return {bonus:Object.fromEntries(STAT_KEYS.map(k => [k, 0])), xp:0, Q:{atk, def, combo:freshComboQ(c)}, career:{J:0,G:0,N:0,P:0}, rec:newRec(), form:[]};
 }
 function newRec(){ return {J:0,G:0,N:0,P:0,pf:0,pa:0,tf:0,ta:0,bo:0,bd:0,pts:0}; }
 function makeFixtures(ids){
@@ -362,6 +385,8 @@ function sanitizeDB(d){
     const T = d.teams[c.id], F = freshTeam(c);
     T.Q.atk.forEach((z, i) => { for(const k in z) if(!Number.isFinite(z[k])) z[k] = F.Q.atk[i][k]; });
     T.Q.def.forEach((z, i) => { for(const k in z) if(!Number.isFinite(z[k])) z[k] = F.Q.def[i][k]; });
+    if(!T.Q.combo) T.Q.combo = freshComboQ(c);
+    COMBO_KEYS.forEach(k => { if(!Number.isFinite(T.Q.combo[k])) T.Q.combo[k] = .2; });
   });
   return d;
 }
@@ -384,7 +409,7 @@ const ATK_SHAPE = {1:[1.1,-2.2], 2:[1.1,2.2], 3:[1.1,-1.0], 4:[1.4,3.4], 5:[1.4,
 function newStats(){
   return {possT:0, terrT:0, tries:0, conv:0, convA:0, pg:0, pgA:0, drops:0, passes:0, offloads:0, breaks:0, metres:0,
     tackles:0, missed:0, rucks:0, rucksWon:0, turnovers:0, pens:0, scrumFeeds:0, scrumWon:0, scrumSteals:0,
-    lineouts:0, lineoutsWon:0, lineoutSteals:0, kicks:0, knock:0, intercepts:0, yellow:0, red:0, subs:0, inj:0,
+    lineouts:0, lineoutsWon:0, lineoutSteals:0, kicks:0, knock:0, intercepts:0, yellow:0, red:0, subs:0, inj:0, combos:0, combosOk:0, comboLog:{},
     planUse:{AV:0,LA:0,PI:0,MO:0}, defUse:{GL:0,IN:0,GR:0}};
 }
 
@@ -548,6 +573,7 @@ class Match {
     return false;
   }
   moveGated(p, tc, tr, bonus = 0){
+    p.tgt = [tc, tr];
     p.acc = Math.min(1.4, p.acc + p.spd * (1 - .16 * p.fat) + bonus);
     if(p.acc >= 1){ p.acc -= 1; this.stepToward(p, tc, tr); }
   }
@@ -613,6 +639,7 @@ class Match {
       if(p.team !== att && o.open && d * (hx(tc, tr) - p.x) > .5) bonus -= .15;
       if(hdist(p.c, p.r, tc, tr) > 6) bonus += .18;   // replacement : il court vers l'action
       if(o.boost && o.boost.has(p)) bonus += .22;      // montée sur un coup de pied
+      if(o.run && o.run.has(p)) bonus += .15;          // course de combinaison lancée
       this.moveGated(p, tc, tr, bonus);
       if(o.boost && o.boost.has(p)) this.stepToward(p, tc, tr);   // sprint sous la chandelle
     }
@@ -631,13 +658,14 @@ class Match {
     let far = 0;
     for(const [p, [c, r]] of tg) if(p.c >= 0) far = Math.max(far, hdist(p.c, p.r, c, r));
     ticks = clamp(Math.ceil(far / 2) + 2, ticks, 24);
-    this.phase = 'arrange'; this.ph = {tg, ticks, then, stuck:new Map()};
+    this.phase = 'arrange'; this.ph = {tg, ticks, then, stuck:new Map()}; this.combo = null;
   }
   snapArrange(){ if(this.phase === 'arrange'){ this.ph.ticks = 0; this.ph_arrange(); for(const p of this.P){ p.ox = p.x; p.oy = p.y; } } }
   ph_arrange(){
     const A = this.ph; let all = true;
     this.dur = .62;
     for(const [p, [c, r]] of shuffle([...A.tg.entries()])){
+      p.tgt = [c, r];
       const dist = hdist(p.c, p.r, c, r), steps = dist > 3 ? 2 : 1;
       for(let k = 0; k < steps; k++){
         if(p.c === c && p.r === r) break;
@@ -727,7 +755,7 @@ class Match {
   changePoss(t){
     if(this.pr) this.endPoss();
     this.poss = t;
-    this.pr = {team:t, x0:this.ballX(), pts:0, ent:[], dent:[]}; this.phaseN = 0;
+    this.pr = {team:t, x0:this.ballX(), pts:0, ent:[], dent:[], combos:[]}; this.phaseN = 0; this.combo = null;
     this.choosePlans(t);
   }
   ctxBias(t, z){
@@ -767,6 +795,7 @@ class Match {
     for(const [z, a] of pr.ent){ const k = z + a; if(seen.has(k)) continue; seen.add(k); const q = this.Q[t].atk[z]; q[a] += lr * (R - q[a]); }
     seen = new Set();
     for(const [z, df] of pr.dent){ const k = z + df; if(seen.has(k)) continue; seen.add(k); const q = this.Q[1 - t].def[z]; q[df] += lr * (-R - q[df]); }
+    const qc = this.Q[t].combo; if(qc) for(const k of new Set(pr.combos)) qc[k] += .08 * (R - qc[k]);
     this.pr = null;
   }
   addPoints(t, pts){ this.score[t] += pts; if(this.pr && this.pr.team === t) this.pr.pts += pts; }
@@ -788,7 +817,7 @@ class Match {
     if(this.over) return;
     this.tickN++;
     this.dur = (this.phase === 'open' && this.ball.state === 'carried') ? 1.1 : 1;
-    for(const p of this.P){ p.ox = p.x; p.oy = p.y; }
+    for(const p of this.P){ p.ox = p.x; p.oy = p.y; p.tgt = null; if(p.bindT > 0 && --p.bindT === 0 && p.state === 'bind') p.state = 'up'; }
     if(this.phase !== 'halftime') this.halfTick++;
     const fr = .00042 * (this.ctx.heat ? 1.35 : 1) * (900 / this.halfTicks);
     for(const p of this.P){
@@ -863,10 +892,13 @@ class Match {
     const c = this.ball.carrier, t = c.team, d = this.dir(t);
     if(c.state !== 'up'){ this.startRuck(c, null); return; }
     if(this.inOppIngoal(c)){ this.scoreTry(c); return; }
-    if(c.hold <= 0 && this.decide(c)){
+    if(this.combo && (this.combo.t !== t || (this.combo.done && this.tickN > this.combo.doneT + 2))) this.combo = null;
+    const scripted = this.combo && !this.combo.done;
+    if(scripted ? this.comboTick(c) : (c.hold <= 0 && this.decide(c))){
       // après une passe instantanée, le jeu continue autour du receveur
       if(this.phase !== 'open' || this.ball.state !== 'carried') return;
       const nc = this.ball.carrier, ov2 = new Map();
+      this.comboOverrides(ov2);
       // le receveur prend le ballon lancé : il court dans la foulée
       if(nc.team === t){ this.runCarrier(nc); this.ball.x = nc.x; this.ball.y = nc.y; if(this.inOppIngoal(nc)){ this.scoreTry(nc); return; } }
       this.P.filter(p => p.team !== nc.team && p.state === 'up').sort((a, b) => hdp(a, nc) - hdp(b, nc)).slice(0, 2).forEach(p => ov2.set(p, [nc.c, nc.r]));
@@ -874,7 +906,8 @@ class Match {
       this.contact(nc);
       return;
     }
-    this.runCarrier(c);
+    if(this.combo && !this.combo.done && this.combo.runners.has(c)) this.followPath(c, this.combo);
+    else if(!(this.combo && !this.combo.done && this.combo.step === -1)) this.runCarrier(c);   // le demi attend que le 1er receveur arrive
     this.ball.x = c.x; this.ball.y = c.y;
     const an = this.anchor || (this.anchor = {x:c.x, y:c.y});
     if(d * (c.x - an.x) > 0){ an.x = c.x; an.y += (c.y - an.y) * .35; }
@@ -882,7 +915,8 @@ class Match {
     const ov = new Map();
     const defs = this.P.filter(p => p.team !== t && p.state === 'up').sort((a, b) => hdp(a, c) - hdp(b, c));
     defs.slice(0, 2).forEach(p => ov.set(p, [c.c, c.r]));
-    this.moveAll(ov, {x:c.x, y:c.y}, t, {carrier:c, open:true, anchor:this.anchor});
+    this.comboOverrides(ov);
+    this.moveAll(ov, {x:c.x, y:c.y}, t, {carrier:c, open:true, anchor:this.anchor, run:this.combo && !this.combo.done ? this.combo.runners : null});
     this.contact(c);
   }
   runCarrier(c){
@@ -1041,7 +1075,8 @@ class Match {
     const dd = this.dir(t), face = dd * (tk.x - c.x);
     const ang = face > .25 ? 0 : face > -.25 ? -.12 : -.25;
     const mis = c.spd - tk.spd > .15 ? -.1 : 0;
-    const pT = clamp(.76 + ((tk.def - 12 * tk.fat) - (c.atk - 12 * c.fat)) / 140 + (adj.length - 1) * .12 + (dplan === 'IN' ? .04 : 0) + ang + mis, .25, .93);
+    const eg = (this.edge && this.edge.team === t && this.tickN <= this.edge.until) ? this.edge.mod : 0;
+    const pT = clamp(.76 + eg + ((tk.def - 12 * tk.fat) - (c.atk - 12 * c.fat)) / 140 + (adj.length - 1) * .12 + (dplan === 'IN' ? .04 : 0) + ang + mis, .25, .93);
     if(rnd() > pT){
       tk.state = 'ground'; tk.groundT = 4; this.slow(1.7);
       this.st[o].missed++;
@@ -1090,8 +1125,108 @@ class Match {
       if(opts.length){ const [a, b] = opts[0]; this.setPos(c, a, b); dom = -1; if(rnd() < .3) this.log(`Gros plaquage offensif du ${this.pn(tk)} !`, 'turn', o); }
     }
     tk.state = 'ground'; tk.groundT = 2;
+    if(this.combo && !this.combo.done){ this.log(`Combinaison étouffée par la défense de ${this.club[o].court}.`, 'info', o); this.combo = null; }
     this.startRuck(c, tk);
     this.ph.dom = dom;
+  }
+
+  // ----- Combinaisons de jeu -----
+  maybeCombo(t, ctxk, x){
+    const plan = this.plan[t].atk, dt = this.dTry(t, x);
+    if(dt < 3 || this.hooter()) return null;
+    const rate = {LA:.38, MO:.32, PI:.15, AV:.12}[plan] * (ctxk === 'ruck' ? 1 : 1.3);
+    if(rnd() > rate) return null;
+    const q = this.Q[t].combo || freshComboQ(this.club[t]), opts = {};
+    for(const k of COMBO_KEYS) if(COMBOS[k].ctx.includes(ctxk)) opts[k] = q[k];
+    return this.softmaxPick(opts, null, .25);
+  }
+  comboRole(K, r){
+    if(r === 'BW'){ const w11 = this.byNum(K.t, 11), side11 = -K.d; return side11 === K.s ? this.byNum(K.t, 14) : w11; }
+    return this.byNum(K.t, r);
+  }
+  startCombo(type, t, ctxk){
+    const C = COMBOS[type], A = {x:this.anchor.x, y:this.anchor.y}, d = this.dir(t), s = this.openSide(A);
+    const K = {type, C, t, d, s, A, step:-1, wait:0, ticks:0, done:false, runners:new Map(), idx:new Map()};
+    for(const [r, wps] of Object.entries(C.paths)){
+      const p = this.comboRole(K, r === 'BW' ? 'BW' : +r);
+      if(!p || !this.active(p)) continue;
+      K.runners.set(p, wps.map(([dep, lat]) => [clamp(A.x - d * dep, .2, COLS - .8), clamp(A.y + s * lat, .4, FIELD_W - .4)]));
+      K.idx.set(p, 0);
+    }
+    K.first = this.comboRole(K, C.first); K.fin = this.comboRole(K, C.fin);
+    if(!K.first || !this.active(K.first)) return;
+    if(C.pack){   // ballon porté simulé : les avants se lient, la défense mord
+      for(const p of this.P) if(p.fw && this.active(p) && p.state === 'up' && Math.hypot(p.x - A.x, p.y - A.y) < 4.5){ p.state = 'bind'; p.bindT = 2; }
+    }
+    this.combo = K;
+    this.st[t].combos++;
+    const L = this.st[t].comboLog; L[type] = L[type] || [0, 0]; L[type][0]++;
+    if(this.pr && this.pr.team === t) this.pr.combos.push(type);
+    this.log(`📋 ${this.club[t].court} lance une combinaison : ${C.nom}.`, 'tac', t);
+    this.slow(1.6);
+  }
+  comboTick(c){   // renvoie true si une passe scriptée a été faite
+    const K = this.combo, C = K.C;
+    if(++K.ticks > 16){ this.combo = null; return false; }
+    if(K.step === -1){
+      const f = K.first;
+      if(f === c){ K.step = 0; K.wait = 0; if(!C.steps.length) this.comboResolve(c); return false; }
+      if(this.active(f) && f.state === 'up' && this.validPass(c, f, 9) && (K.wait >= 1 || this.minOppDist(c) <= 2 || C.first === 10)){
+        this.passBall(c, f, {});
+        K.step = 0; K.wait = 0;
+        if(!C.steps.length && this.ball.carrier === f) this.comboResolve(f);
+        return true;
+      }
+      if(++K.wait > 3) this.combo = null;
+      return false;
+    }
+    if(K.step < C.steps.length){
+      const S = C.steps[K.step], from = this.comboRole(K, S.from), to = this.comboRole(K, S.to);
+      if(c !== from){ this.combo = null; return false; }
+      K.wait++;
+      const pressed = this.minOppDist(c) <= 2;   // défenseur sur lui : il lâche le ballon tout de suite
+      if((K.wait >= S.after || pressed) && this.active(to) && to.state === 'up' && this.validPass(c, to, 8)){
+        this.passBall(c, to, {});
+        K.step++; K.wait = 0;
+        if(K.step === C.steps.length && this.ball.state === 'carried' && this.ball.carrier === to) this.comboResolve(to);
+        return true;
+      }
+      if(K.wait > S.after + 3) this.combo = null;
+    }
+    return false;
+  }
+  comboResolve(p){
+    const K = this.combo; if(!K || K.done) return;
+    K.done = true; K.doneT = this.tickN;
+    const t = K.t, o = 1 - t, Ea = this.eff[t], Eo = this.eff[o];
+    const pS = clamp(.45 + ((Ea.passe + Ea.attaque) / 2 - Eo.defense) / 120 + (K.C.vs[this.plan[o].def] || 0), .2, .8);
+    const ok = rnd() < pS;
+    this.edge = {team:t, until:this.tickN + 5, mod:ok ? -.22 : .12};
+    if(ok){
+      p.burst = 3; p.acc = Math.max(p.acc, 1);
+      this.st[t].combosOk++; this.st[t].comboLog[K.type][1]++;
+      this.log(`✨ ${K.C.nom} : la défense de ${this.club[o].court} est prise à défaut !`, 'break', t);
+      this.say(`${K.C.nom}, parfaitement exécutée par ${this.club[t].court} !`, 1);
+      this.fx('ooh'); this.slow(1.8);
+    } else this.log(`La défense de ${this.club[o].court} a lu la combinaison.`, 'info', o);
+  }
+  followPath(p, K){   // le porteur scripté suit sa course prévue
+    const wps = K.runners.get(p); let i = K.idx.get(p);
+    while(i < wps.length - 1 && Math.hypot(p.x - wps[i][0], p.y - wps[i][1]) < 1.1) i++;
+    K.idx.set(p, i);
+    const [tc, tr] = toHex(wps[i][0], wps[i][1]);
+    const x0 = p.x; this.moveGated(p, tc, tr, .1);
+    this.st[p.team].metres += Math.max(0, this.dir(p.team) * (p.x - x0)) * M_PER_U;
+  }
+  comboOverrides(ov){
+    const K = this.combo; if(!K || K.done) return;
+    for(const [p, wps] of K.runners){
+      if(p === this.ball.carrier || !this.active(p) || p.state !== 'up') continue;
+      let i = K.idx.get(p);
+      while(i < wps.length - 1 && Math.hypot(p.x - wps[i][0], p.y - wps[i][1]) < 1.1) i++;
+      K.idx.set(p, i);
+      ov.set(p, toHex(wps[i][0], wps[i][1]));
+    }
   }
 
   // ----- Ruck -----
@@ -1105,7 +1240,7 @@ class Match {
     const nd = this.plan[o].def === 'GR' ? 2 : 1;
     R.defR = this.P.filter(p => p.team === o && p.state === 'up' && hdp(p, R) <= 4)
       .sort((a, b) => (hdp(a, R) + (a.fw ? 0 : 1.5)) - (hdp(b, R) + (b.fw ? 0 : 1.5))).slice(0, nd);
-    this.phase = 'ruck'; this.ph = R; this.slow(1.8);
+    this.phase = 'ruck'; this.ph = R; this.slow(1.8); this.combo = null;
     this.st[t].rucks++;
   }
   sideHex(R, sg, p){
@@ -1158,7 +1293,11 @@ class Match {
     if(!sh){ this.startScrum(R.c, R.r, t, 'ballon injouable'); return; }
     this.choosePlans(t);
     this.ball.x = sh.x; this.ball.y = sh.y;
-    this.giveBall(sh, {intent:this.ruckIntent(t, R.x), fresh:true, ax:R.x, ay:R.y});
+    let rIt = this.ruckIntent(t, R.x);
+    const ck = rIt === 'ten' ? this.maybeCombo(t, 'ruck', R.x) : null;
+    if(ck) rIt = null;
+    this.giveBall(sh, {intent:rIt, fresh:true, ax:R.x, ay:R.y});
+    if(ck) this.startCombo(ck, t, 'ruck');
     this.phase = 'open';
   }
   ruckIntent(t, x){
@@ -1411,8 +1550,11 @@ class Match {
     this.ball.x = nine.x; this.ball.y = nine.y;
     let intent = this.setPieceIntent(win, S.mx);
     if(dt <= 3 && rnd() < .5) intent = 'pick';
-    this.giveBall(nine, {fresh:true, intent, ax:S.mx, ay:S.my});
+    const ck = intent === 'ten' ? this.maybeCombo(win, 'scrum', S.mx) : null;
+    const holder = ck === 'n8' ? this.byNum(win, 8) : nine;
+    this.giveBall(holder, {fresh:true, intent:ck ? null : intent, ax:S.mx, ay:S.my});
     this.phase = 'open';
+    if(ck) this.startCombo(ck, win, 'scrum');
   }
 
   // ----- Touche -----
@@ -1473,9 +1615,13 @@ class Match {
     const maul = win === T && !this.hooter() && (dt <= 7 ? rnd() < .7 : this.plan[T].atk === 'AV' ? rnd() < .45 : rnd() < .15);
     if(maul){ this.startMaul(jumper); return; }
     this.phase = 'open';
-    const n9 = this.byNum(win, 9), it9 = this.setPieceIntent(win, Lo.x);
+    const n9 = this.byNum(win, 9);
+    let it9 = this.setPieceIntent(win, Lo.x);
+    const ck = it9 === 'ten' ? this.maybeCombo(win, 'lineout', Lo.x) : null;
+    if(ck) it9 = null;
     if(n9 !== jumper && this.validPass(jumper, n9, 10)) this.passBall(jumper, n9, {sure:true, intent:it9});
     else this.giveBall(jumper === n9 ? jumper : n9, {intent:it9});
+    if(ck && this.ball.state === 'carried' && this.ball.carrier.team === win) this.startCombo(ck, win, 'lineout');
   }
 
   // ----- Maul -----
@@ -2040,7 +2186,7 @@ function render(al, view){
     ctx.beginPath(); for(let i = 0; i < 6; i++){ const an = Math.PI / 6 + i * Math.PI / 3; const p = proj(X + Math.cos(an) * R, Y + Math.sin(an) * R); i ? ctx.lineTo(...p) : ctx.moveTo(...p); } ctx.closePath();
     ctx.fillStyle = 'rgba(244,196,48,.35)'; ctx.fill(); ctx.strokeStyle = '#f4c430'; ctx.lineWidth = 1.5; ctx.stroke();
   }
-  if(!view) drawAids(m, al, col);
+  if(!view){ drawRuns(m, al, col); drawAids(m, al, col); }
   // objets triés par profondeur
   const items = [];
   for(const p of m.P){ if(p.state === 'bin' || p.state === 'off') continue; const x = p.ox + (p.x - p.ox) * al, y = p.oy + (p.y - p.oy) * al; items.push({d:x + y, f:() => drawPlayer(p, x, y, col[p.team], m, m.ball.state === 'carried' && m.ball.carrier === p)}); }
@@ -2076,6 +2222,43 @@ function drawArrow(x0, y0, x1, y1, color, alpha, wdt){
   ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0] - ux * hs * .8, b[1] - uy * hs * .8); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(b[0], b[1]); ctx.lineTo(b[0] - ux * hs - uy * hs * .55, b[1] - uy * hs + ux * hs * .55); ctx.lineTo(b[0] - ux * hs + uy * hs * .55, b[1] - uy * hs - ux * hs * .55); ctx.closePath(); ctx.fill();
   ctx.globalAlpha = 1;
+}
+function drawRuns(m, al, col){
+  if(!showRuns) return;
+  const K = m.combo && !m.combo.done ? m.combo : null;
+  ctx.lineWidth = Math.max(1, cam.s * .035); ctx.setLineDash([2, 5]);
+  for(const p of m.P){
+    if(!p.tgt || p.state !== 'up' || p.c < 0 || (K && K.runners.has(p))) continue;
+    const x = p.ox + (p.x - p.ox) * al, y = p.oy + (p.y - p.oy) * al, tx = hx(p.tgt[0], p.tgt[1]), ty = hy(p.tgt[1]);
+    if(Math.hypot(tx - x, ty - y) < 1.2) continue;
+    const a = proj(x, y, .03), b = proj(tx, ty, .03), c = col[p.team].c1;
+    ctx.strokeStyle = c === '#1a1a1a' ? '#e3001b' : c; ctx.globalAlpha = .55;
+    ctx.beginPath(); ctx.moveTo(...a); ctx.lineTo(...b); ctx.stroke();
+    ctx.globalAlpha = .75; ctx.fillStyle = ctx.strokeStyle; ctx.beginPath(); ctx.arc(b[0], b[1], Math.max(1.5, cam.s * .05), 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.setLineDash([]); ctx.globalAlpha = 1;
+  // courses prévues de la combinaison en cours
+  if(K){
+    for(const [p, wps] of K.runners){
+      if(!m.active(p) || p.c < 0) continue;
+      const x = p.ox + (p.x - p.ox) * al, y = p.oy + (p.y - p.oy) * al;
+      const pts = [proj(x, y, .05)].concat(wps.slice(K.idx.get(p) || 0).map(w => proj(w[0], w[1], .05)));
+      if(pts.length < 2) continue;
+      ctx.lineCap = 'round'; ctx.setLineDash([7, 6]);
+      ctx.strokeStyle = 'rgba(0,0,0,.6)'; ctx.lineWidth = Math.max(4, cam.s * .13);
+      ctx.beginPath(); pts.forEach((q, i) => i ? ctx.lineTo(...q) : ctx.moveTo(...q)); ctx.stroke();
+      ctx.strokeStyle = p === K.fin ? '#f4c430' : '#ffffff'; ctx.lineWidth = Math.max(2.2, cam.s * .075);
+      ctx.beginPath(); pts.forEach((q, i) => i ? ctx.lineTo(...q) : ctx.moveTo(...q)); ctx.stroke();
+      ctx.setLineDash([]);
+      const e = pts[pts.length - 1], e0 = pts[pts.length - 2];
+      drawHead(e0, e, p === K.fin ? '#f4c430' : '#ffffff', Math.max(7, cam.s * .25));
+    }
+  }
+}
+function drawHead(a, b, color, hs){
+  const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1, ux = dx / L, uy = dy / L;
+  ctx.fillStyle = color; ctx.beginPath(); ctx.moveTo(b[0] + ux * hs * .3, b[1] + uy * hs * .3);
+  ctx.lineTo(b[0] - ux * hs - uy * hs * .55, b[1] - uy * hs + ux * hs * .55); ctx.lineTo(b[0] - ux * hs + uy * hs * .55, b[1] - uy * hs - ux * hs * .55); ctx.closePath(); ctx.fill();
 }
 function drawAids(m, al, col){
   // ligne d'avantage (point de départ de la phase)
@@ -2225,7 +2408,7 @@ function drainSfx(){
 //  INTERFACE
 // =====================================================================
 const $ = id => document.getElementById(id);
-let showMini = true;
+let showMini = true, showRuns = true;
 let match = null, running = false, speed = 1, acc = 0, last = 0, logIdx = 0, ended = false, liveFixture = null;
 const TICK_MS = 230;
 
@@ -2267,6 +2450,7 @@ $('btnPause').onclick = () => { running = !running; $('btnPause').textContent = 
 $('speed').onclick = e => { const b = e.target.closest('button'); if(!b) return; speed = +b.dataset.s; [...$('speed').children].forEach(x => x.classList.toggle('on', x === b)); };
 $('btnSnd').onclick = () => { audioInit(); AUD.on = !AUD.on; $('btnSnd').classList.toggle('on', AUD.on); };
 $('btnVoice').onclick = () => { audioInit(); AUD.voice = !AUD.voice; $('btnVoice').classList.toggle('on', AUD.voice); if(!AUD.voice) try{ speechSynthesis.cancel(); }catch(e){} };
+$('btnRuns').onclick = () => { showRuns = !showRuns; $('btnRuns').classList.toggle('on', showRuns); };
 $('selMonth').onchange = $('selWx').onchange = () => { if(!running){ newMatch($('selH').value, $('selA').value); refreshTabs(); } };
 function onSelChange(e){
   if($('selH').value === $('selA').value){ const other = CLUBS.find(c => c.id !== $('selH').value); (e.target.id === 'selH' ? $('selA') : $('selH')).value = other.id; }
@@ -2434,6 +2618,7 @@ function renderStats(){
     ['Touches gagnées (lancers)', `${A.lineoutsWon}/${A.lineouts}`, `${B.lineoutsWon}/${B.lineouts}`, A.lineoutsWon, B.lineoutsWon],
     ['Coups de pied', A.kicks, B.kicks], ['En-avant', A.knock, B.knock], ['Pénalités concédées', A.pens, B.pens],
     ['Cartons jaunes / rouges', `${A.yellow} / ${A.red}`, `${B.yellow} / ${B.red}`, A.yellow + A.red, B.yellow + B.red],
+    ['Combinaisons réussies', `${A.combosOk}/${A.combos}`, `${B.combosOk}/${B.combos}`, A.combosOk, B.combosOk],
     ['Remplacements', A.subs, B.subs], ['Blessés', A.inj, B.inj]
   ];
   const c0 = col[0].c1 === '#f2f2f2' ? '#ddd' : col[0].c1, c1 = col[1].c1 === '#f2f2f2' ? '#ddd' : col[1].c1;
@@ -2498,7 +2683,10 @@ function aiCard(id, m){
     const q = Q.def[z], best = Object.keys(q).reduce((a, b) => q[a] > q[b] ? a : b);
     h += `<div class="z">${zn}</div>` + Object.keys(DEF_PLANS).map(k => `<div class="${k === best ? 'best' : ''}" style="background:${qColor(q[k], dmn, dmx)}">${q[k].toFixed(2)}</div>`).join('');
   });
-  return h + `</div></div>`;
+  const qc = Q.combo || {}, cv = COMBO_KEYS.map(k => qc[k] || 0), cmn = Math.min(...cv), cmx = Math.max(...cv), cb = COMBO_KEYS.reduce((a, b) => (qc[a] || 0) > (qc[b] || 0) ? a : b);
+  h += `</div><div class="small" style="margin:8px 0 4px">Combinaisons préférées (valeur apprise)</div><div style="display:flex;flex-wrap:wrap;gap:4px">` +
+    COMBO_KEYS.map(k => `<span class="small" style="padding:4px 7px;border-radius:6px;background:${qColor(qc[k] || 0, cmn, cmx)};${k === cb ? 'outline:2px solid var(--acc);font-weight:700' : ''}">${COMBOS[k].nom} ${(qc[k] || 0).toFixed(2)}</span>`).join('') + `</div>`;
+  return h + `</div>`;
 }
 function renderAI(){
   const m = match; if(!m) return;
