@@ -54,7 +54,7 @@ button,select{font:inherit;color:inherit}
 #overlayStart div{background:#0d1526e6;border:1px solid var(--line);border-radius:12px;padding:12px 16px;text-align:center;max-width:80%}
 /* Contrôles */
 #controls{display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px}
-#controls select{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:7px 8px;max-width:44%}
+#controls select,.btnrow select{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:7px 8px;max-width:44%}
 #controls .row2{display:flex;flex-wrap:wrap;gap:6px;width:100%;order:9}
 #controls .row2 select{max-width:none;flex:1;min-width:120px}
 .btn.tog{opacity:.55}.btn.tog.on{opacity:1;border-color:#3a4c72}
@@ -121,6 +121,10 @@ table{width:100%;border-collapse:collapse}
 .lg tr.q1 td:first-child{box-shadow:inset 3px 0 0 var(--acc2)}
 .lg tr.q2 td:first-child{box-shadow:inset 3px 0 0 #4ea1ff}
 .lg tr.rel td:first-child{box-shadow:inset 3px 0 0 var(--red)}
+.lg tr[data-id]{cursor:pointer}
+.lg tr[data-id]:hover td,.lg tr[data-id]:focus td{background:#16213a}
+.lg tr.me td{font-weight:700;color:var(--acc)}
+.lg tr.sel td{background:#1d2a44}
 .lg .dot{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px}
 .btnrow{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
 .prog{height:6px;background:#0b1220;border-radius:3px;overflow:hidden;margin:6px 0}
@@ -1913,6 +1917,8 @@ class Match {
 // =====================================================================
 //  RÉSULTATS, EXPÉRIENCE, CHAMPIONNAT
 // =====================================================================
+const SST_KEYS = ['conv','convA','pg','pgA','drops','metres','breaks','passes','offloads','tackles','missed','turnovers','intercepts',
+  'rucks','rucksWon','scrumFeeds','scrumWon','lineouts','lineoutsWon','knock','pens','yellow','red','combos','combosOk'];
 function applyResult(m, opt = {}){
   const [h, a] = m.ids, [sh, sa] = m.score, [th, ta] = m.tries;
   const res = [{id:h, pf:sh, pa:sa, tf:th, ta:ta}, {id:a, pf:sa, pa:sh, tf:ta, ta:th}];
@@ -1941,6 +1947,10 @@ function applyResult(m, opt = {}){
       if(win){ R.G++; R.pts += 4; } else if(draw){ R.N++; R.pts += 2; } else R.P++;
       if(r.tf - r.ta >= 3){ R.bo++; R.pts++; }
       if(!win && !draw && r.pa - r.pf <= 5){ R.bd++; R.pts++; }
+      const S = T.sst || (T.sst = {}), st = m.st[i], po = st.possT + m.st[1 - i].possT;
+      SST_KEYS.forEach(k => S[k] = (S[k] || 0) + st[k]);
+      S.poss = (S.poss || 0) + (po ? st.possT / po * 100 : 50); S.n = (S.n || 0) + 1;
+      (T.res || (T.res = [])).push({k:opt.kind, o:res[1 - i].id, dom:i === 0, pf:r.pf, pa:r.pa});
     }
   });
   DB.inj = DB.inj || {};
@@ -1978,7 +1988,7 @@ function runPlayoffs(){
 }
 function startNewSeason(){
   const n = DB.season.n + 1;
-  CLUBS.forEach(c => { const T = DB.teams[c.id]; T.rec = newRec(); STAT_KEYS.forEach(k => T.bonus[k] = +(T.bonus[k] * .7).toFixed(2)); });
+  CLUBS.forEach(c => { const T = DB.teams[c.id]; T.rec = newRec(); T.sst = {}; T.res = []; STAT_KEYS.forEach(k => T.bonus[k] = +(T.bonus[k] * .7).toFixed(2)); });
   DB.season = newSeason(n);
   DB.inj = {};
 }
@@ -2721,19 +2731,57 @@ function simMany(nj){
   };
   setTimeout(step, 0);
 }
+// [libellé, valeur (S = stats cumulées, R = bilan), unité, 1 si plus = mieux / -1 sinon]
+const rat = (a, b) => b ? a / b * 100 : 0;
+const SEASON_ROWS = [
+  ['Points marqués / match', (S, R) => R.pf / R.J, '', 1], ['Points encaissés / match', (S, R) => R.pa / R.J, '', -1],
+  ['Essais marqués / match', (S, R) => R.tf / R.J, '', 1], ['Essais encaissés / match', (S, R) => R.ta / R.J, '', -1],
+  ['Possession', S => S.poss / S.n, '%', 1], ['Mètres gagnés / match', S => S.metres / S.n, '', 1],
+  ['Franchissements / match', S => S.breaks / S.n, '', 1], ['Passes / match', S => S.passes / S.n, '', 1],
+  ['Passes après contact / match', S => S.offloads / S.n, '', 1], ['Réussite au plaquage', S => rat(S.tackles, S.tackles + S.missed), '%', 1],
+  ['Rucks conservés', S => rat(S.rucksWon, S.rucks), '%', 1], ['Ballons grattés / match', S => S.turnovers / S.n, '', 1],
+  ['Interceptions / match', S => S.intercepts / S.n, '', 1], ['Mêlées gagnées (introd.)', S => rat(S.scrumWon, S.scrumFeeds), '%', 1],
+  ['Touches gagnées (lancers)', S => rat(S.lineoutsWon, S.lineouts), '%', 1], ['Réussite au but', S => rat(S.conv + S.pg, S.convA + S.pgA), '%', 1],
+  ['Drops (saison)', S => S.drops, '', 1], ['Combinaisons réussies', S => rat(S.combosOk, S.combos), '%', 1],
+  ['En-avant / match', S => S.knock / S.n, '', -1], ['Pénalités concédées / match', S => S.pens / S.n, '', -1],
+  ['Cartons jaunes + rouges (saison)', S => S.yellow + S.red, '', -1]
+];
+function seasonCard(id, tb){
+  const T = DB.teams[id], R = T.rec, S = T.sst, c = CLUB[id], pos = tb.findIndex(r => r.id === id) + 1;
+  let h = `<div class="card"><h4><span class="kit" style="width:10px;height:20px;background:linear-gradient(180deg,${c.c1} 60%,${c.c2} 60%)"></span>${c.nom} · saison ${DB.season.n}</h4>`;
+  if(!R.J || !S || !S.n) return h + `<div class="small mut">Aucun match de championnat enregistré cette saison.</div></div>`;
+  const res = T.res || [], ha = dom => { const L = res.filter(x => x.dom === dom); return `${L.filter(x => x.pf > x.pa).length}V ${L.filter(x => x.pf === x.pa).length}N ${L.filter(x => x.pf < x.pa).length}D`; };
+  h += `<div class="small">${pos}<sup>${pos === 1 ? 'er' : 'e'}</sup> · <b>${R.pts} pts</b> · ${R.G}V ${R.N}N ${R.P}D · ${R.pf} pour / ${R.pa} contre · ${R.tf} essais marqués / ${R.ta} encaissés · bonus ${R.bo} off. + ${R.bd} déf.</div>`;
+  h += `<div class="small mut" style="margin:2px 0 6px">🏠 Domicile ${ha(true)} · ✈️ Extérieur ${ha(false)}</div>`;
+  const others = CLUBS.map(x => DB.teams[x.id]).filter(X => X.rec.J && X.sst && X.sst.n);
+  h += `<table class="lg"><tr><th style="text-align:left">Statistique</th><th>Valeur</th><th>Rang</th></tr>`;
+  for(const [lab, f, u, sg] of SEASON_ROWS){
+    const v = f(S, R), rank = 1 + others.filter(X => sg * f(X.sst, X.rec) > sg * v + 1e-9).length;
+    h += `<tr><td class="cl">${lab}</td><td>${u === '%' || v >= 100 || Number.isInteger(v) ? Math.round(v) : v.toFixed(1)}${u}</td><td class="${rank <= 3 ? 'mut' : ''}" style="${rank <= 3 ? 'color:#3ddc97' : rank > others.length - 3 ? 'color:#ff9b9b' : ''}">${rank}<sup>${rank === 1 ? 'er' : 'e'}</sup></td></tr>`;
+  }
+  h += `</table><div class="sec">Résultats</div><div class="small">` + res.map(x => { const f = x.pf > x.pa ? 'V' : x.pf === x.pa ? 'N' : 'D';
+    return `<div class="form" style="margin:2px 0"><span class="${f}">${f}</span> <span class="mut">${x.k}</span> ${x.dom ? '🏠' : '✈️'} ${CLUB[x.o].court} ${x.pf} – ${x.pa}</div>`; }).join('') + `</div>`;
+  const inj = DB.inj && DB.inj[id] ? Object.entries(DB.inj[id]) : [];
+  if(inj.length) h += `<div class="small" style="color:#ff9b9b;margin-top:4px">Infirmerie : ${inj.map(([k, v]) => `${k} (${v} match${v > 1 ? 's' : ''})`).join(', ')}</div>`;
+  return h + `</div>`;
+}
+let leagueSel = null;
 function renderLeague(){
-  const S = DB.season, tb = standings();
+  const S = DB.season, tb = standings(), sel = leagueSel || DB.my;
   let h = `<div class="sec">Top 14 — saison ${S.n} · ${S.j >= S.fixtures.length ? 'saison régulière terminée' : `prochaine : journée ${S.j + 1}/26`}</div>`;
   h += `<table class="lg"><tr><th>#</th><th style="text-align:left">Club</th><th>Pts</th><th>J</th><th>G</th><th>N</th><th>P</th><th>Diff</th><th>B</th></tr>`;
   tb.forEach((r, i) => {
     const c = CLUB[r.id];
-    h += `<tr class="${i < 2 ? 'q1' : i < 6 ? 'q2' : i === 13 ? 'rel' : ''}"><td>${i + 1}</td><td class="cl"><span class="dot" style="background:${c.c1}"></span>${c.court}</td><td><b>${r.pts}</b></td><td>${r.J}</td><td>${r.G}</td><td>${r.N}</td><td>${r.P}</td><td>${r.pf - r.pa > 0 ? '+' : ''}${r.pf - r.pa}</td><td>${r.bo + r.bd}</td></tr>`;
+    h += `<tr class="${i < 2 ? 'q1' : i < 6 ? 'q2' : i === 13 ? 'rel' : ''}${r.id === DB.my ? ' me' : ''}${r.id === sel ? ' sel' : ''}" data-id="${r.id}" tabindex="0" title="Voir les statistiques"><td>${i + 1}</td><td class="cl"><span class="dot" style="background:${c.c1}"></span>${c.court}</td><td><b>${r.pts}</b></td><td>${r.J}</td><td>${r.G}</td><td>${r.N}</td><td>${r.P}</td><td>${r.pf - r.pa > 0 ? '+' : ''}${r.pf - r.pa}</td><td>${r.bo + r.bd}</td></tr>`;
   });
-  h += `</table><div class="legend"><span style="color:#3ddc97">▌</span>Demi-finales <span style="color:#4ea1ff">▌</span>Barrages <span style="color:#ff5d5d">▌</span>Relégation</div>`;
+  h += `</table><div class="legend"><span style="color:#3ddc97">▌</span>Demi-finales <span style="color:#4ea1ff">▌</span>Barrages <span style="color:#ff5d5d">▌</span>Relégation · touchez un club pour ses statistiques</div>`;
+  h += `<div class="btnrow small" style="align-items:center">Mon club <select id="selMy" aria-label="Mon club"><option value="">— aucun —</option>${CLUBS.map(c => `<option value="${c.id}"${c.id === DB.my ? ' selected' : ''}>${c.nom}</option>`).join('')}</select>
+    Stats de <select id="selStat" aria-label="Statistiques de l'équipe"><option value="">—</option>${CLUBS.map(c => `<option value="${c.id}"${c.id === sel ? ' selected' : ''}>${c.nom}</option>`).join('')}</select></div>`;
+  if(sel) h += seasonCard(sel, tb) + teamCard(sel);
   if(S.j < S.fixtures.length){
     const fx = S.fixtures[S.j].map(([hh, aa], k) => ({hh, aa, k, done:!!S.played[`${S.j}-${k}`]}));
-    const next = fx.find(f => !f.done);
-    h += `<div class="sec">Journée ${S.j + 1}</div><div class="small">` + fx.map(f => `${f.done ? '✔' : '•'} ${CLUB[f.hh].court} – ${CLUB[f.aa].court}`).join('<br>') + `</div>`;
+    const mine = f => f.hh === DB.my || f.aa === DB.my, next = fx.find(f => !f.done && mine(f)) || fx.find(f => !f.done);
+    h += `<div class="sec">Journée ${S.j + 1}</div><div class="small">` + fx.map(f => `${f.done ? '✔' : '•'} ${mine(f) ? '<b>' : ''}${CLUB[f.hh].court} – ${CLUB[f.aa].court}${mine(f) ? '</b>' : ''}`).join('<br>') + `</div>`;
     h += `<div class="btnrow">${next ? `<button class="btn primary" id="btnWatch">Regarder ${CLUB[next.hh].court} – ${CLUB[next.aa].court}</button>` : ''}
       <button class="btn" id="btnJ">Simuler la journée</button><button class="btn" id="btnSeason">Simuler le reste de la saison</button></div>
       <div class="prog"><i id="simProg"></i></div>`;
@@ -2752,9 +2800,14 @@ function renderLeague(){
   bind('btnJ', () => simMany(1));
   bind('btnSeason', () => simMany(26));
   bind('btnNewSeason', () => { startNewSeason(); saveDB(); renderLeague(); });
+  const pick = id => { leagueSel = id || null; renderLeague(); };
+  $('tab-league').querySelectorAll('tr[data-id]').forEach(tr => { tr.onclick = () => pick(tr.dataset.id); tr.onkeydown = e => { if(e.key === 'Enter') pick(tr.dataset.id); }; });
+  $('selStat').onchange = e => pick(e.target.value);
+  $('selMy').onchange = e => { DB.my = e.target.value || null; leagueSel = null; saveDB(); renderLeague(); };
   bind('btnWatch', () => {
-    const k = S.fixtures[S.j].findIndex((_, i) => !S.played[`${S.j}-${i}`]); if(k < 0) return;
-    const [hh, aa] = S.fixtures[S.j][k];
+    const free = i => !S.played[`${S.j}-${i}`], F = S.fixtures[S.j];
+    let k = F.findIndex(([hh, aa], i) => free(i) && (hh === DB.my || aa === DB.my)); if(k < 0) k = F.findIndex((_, i) => free(i)); if(k < 0) return;
+    const [hh, aa] = F[k];
     $('selH').value = hh; $('selA').value = aa;
     newMatch(hh, aa, {h:hh, a:aa, j:S.j, key:`${S.j}-${k}`});
     startMatch(); window.scrollTo({top:0, behavior:'smooth'});

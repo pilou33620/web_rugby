@@ -33,6 +33,8 @@ Bancs d'essai : `python3 tests/banc-serveur.py` et `python3 appairage.py`, qui a
 - **Combinaisons de jeu** : croisée, redoublement, intrusion de l'arrière, ailier qui rentre, leurre, départ du n°8, ballon porté simulé. Les courses prévues sont tracées en pointillés, les équipes apprennent quelles combinaisons marchent pour elles, et la défense peut les lire.
 - **Apprentissage par renforcement** : chaque possession met à jour la valeur des plans selon la zone du terrain. S'y ajoutent de l'expérience (XP) et une progression des statistiques après chaque match.
 - **Championnat** : 26 journées, barème du Top 14 avec bonus, barrages, demi-finales et finale, palmarès.
+  - **Mon club** : choisissez un club à suivre ; il est mis en avant au classement et « Regarder » lance son match de la journée.
+  - **Stats de chaque équipe** : touchez un club au classement pour voir son bilan (domicile / extérieur), ses moyennes de la saison avec son rang parmi les 14 clubs, ses résultats et son infirmerie.
 - **Lecture du jeu** :
   - flèches de passe, trajectoires des coups de pied, ligne d'avantage ;
   - courses de tous les joueurs affichées en permanence (bouton 🧭 Courses) ;
