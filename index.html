@@ -442,6 +442,8 @@ class Match {
     this.occ = new Int16Array(COLS * ROWS).fill(-1);
     this.P = [];
     this.st = [newStats(), newStats()];
+    this.gp = [this.gamePlan(0), this.gamePlan(1)];
+    for(const t of [0, 1]) if(this.gp[t].notes.length) this.log(`🗒️ Plan de match de ${this.club[t].court} : ${this.gp[t].notes.join(' · ')}.`, 'tac', t);
     this.plan = [{atk:CLUB[hid].style, def:CLUB[hid].dstyle}, {atk:CLUB[aid].style, def:CLUB[aid].dstyle}];
     this.ball = {state:'dead', x:HALFWAY, y:MID_Y, z:0};
     this.poss = -1; this.pr = null; this.phasePasses = 0;
@@ -772,7 +774,35 @@ class Match {
     const rn = this.ctx.rain;
     if(rn){ b.PI += .1 * rn; b.AV += .08 * rn; b.LA -= .1 * rn; b.MO -= .08 * rn; }
     if(this.ctx.wind > .5) b.PI -= .05;
+    for(const k in b) b[k] += this.gp[t].atk[k];
     return b;
+  }
+  // plan de match : le staff étudie l'adversaire avant le coup d'envoi, puis corrige à la mi-temps selon les stats
+  gamePlan(t, half){
+    const o = 1 - t, E = this.eff[t], F = this.eff[o], d = k => E[k] - F[k];
+    const g = {atk:{AV:0, LA:0, PI:0, MO:0}, def:{GL:0, IN:0, GR:0}, touch:0, scrum:0, notes:[]};
+    const add = (cond, f, note) => { if(cond){ f(); g.notes.push(note); } };
+    if(!half){
+      add(d('melee') > 4, () => { g.atk.AV += .12; g.scrum += .2; }, 'pack plus fort, jeu d\'avants et mêlées');
+      add(d('rapidite') > 4, () => { g.atk.LA += .12; }, 'plus rapides, écarter le jeu');
+      add(d('pied') > 4, () => { g.atk.PI += .1; }, 'meilleur jeu au pied, occuper le terrain');
+      add(d('touche') > 4, () => { g.touch += .15; }, 'touche solide, viser les pénaltouches');
+      add(d('touche') < -4, () => { g.touch -= .15; }, 'touche fragile, prendre les points');
+      add(F.rapidite - E.defense > 3, () => { g.def.GL += .15; }, 'adversaire rapide, défense glissée');
+      add(d('defense') > 4, () => { g.def.IN += .12; }, 'défense supérieure, monter vite');
+      add(F.discipline < E.discipline - 4, () => { g.def.GR += .12; }, 'adversaire indiscipliné, contester au sol');
+      return g;
+    }
+    const S = this.st[t], O = this.st[o], diff = this.score[t] - this.score[o];
+    add(S.scrumFeeds >= 3 && S.scrumWon / S.scrumFeeds < .7, () => { g.scrum -= .3; g.atk.AV -= .08; }, 'mêlée en souffrance, l\'éviter');
+    add(O.scrumFeeds >= 3 && O.scrumWon / O.scrumFeeds < .75, () => { g.scrum += .3; g.atk.AV += .08; }, 'mêlée dominatrice, la choisir sur pénalité');
+    add(S.lineouts >= 3 && S.lineoutsWon / S.lineouts < .6, () => { g.touch -= .25; }, 'touche en difficulté, moins de pénaltouches');
+    add(O.turnovers >= 4, () => { g.atk.AV -= .08; g.atk.PI += .08; }, 'trop de ballons perdus au sol, jouer au pied');
+    add(O.breaks >= 14, () => { g.def.GL += .15; g.def.IN -= .1; }, 'trop de franchissements encaissés, défense plus prudente');
+    add(S.pens >= 7, () => { g.def.GR -= .15; }, 'discipline : moins de contestation au sol');
+    add(diff <= -10, () => { g.atk.LA += .1; g.atk.MO += .1; g.atk.PI -= .1; }, 'mené, prendre des risques');
+    add(diff >= 10, () => { g.atk.PI += .1; g.atk.AV += .05; g.atk.LA -= .05; }, 'devant, gérer l\'avance');
+    return g;
   }
   softmaxPick(q, bias, tau = .25){
     const ks = Object.keys(q), w = ks.map(k => Math.exp((q[k] + (bias ? bias[k] || 0 : 0)) / tau));
@@ -783,7 +813,7 @@ class Match {
   choosePlans(t){
     const o = 1 - t, z = this.zoneOf(t, this.ballX());
     const a = this.softmaxPick(this.Q[t].atk[z], this.ctxBias(t, z));
-    const df = this.softmaxPick(this.Q[o].def[z]);
+    const df = this.softmaxPick(this.Q[o].def[z], this.gp[o].def);
     if(this.plan[t].atk !== a && rnd() < .12) this.log(`${this.club[t].court} bascule en « ${ATK_PLANS[a]} ».`, 'tac', t);
     this.plan[t].atk = a; this.plan[o].def = df;
     if(this.pr && this.pr.team === t){ this.pr.ent.push([z, a]); this.pr.dent.push([z, df]); }
@@ -1766,12 +1796,19 @@ class Match {
     for(const p of this.P){ if(p.state !== 'up' && this.active(p)){ p.state = 'up'; p.groundT = 0; } }
     const kicker = this.bestKicker(t), pg = this.goalProb(kicker, x, y, t), dt = this.dTry(t, x);
     const diff = this.score[t] - this.score[o];
+    // gestion du score : en fin de match, mené de plus d'un essai on joue la touche, à portée on prend les points
+    const g = this.gp[t], late = this.half === 2 && this.halfTick > this.halfTicks * .75;
+    const chase = late && diff < -7, close = late && diff >= -3 && diff <= 4;
+    const thr = .58 + (chase ? .3 : 0) - (close ? .15 : 0) + g.touch * .3;
     let choice;
     if(this.hooter()){ choice = (pg >= .3 && diff <= 2) || (pg >= .45) ? 'goal' : 'end'; }
-    else if(pg >= .58 && !(dt <= 5 && this.plan[t].atk === 'AV' && diff < 0 && rnd() < .5)) choice = 'goal';
-    else if(dt <= 10 && rnd() < .75) choice = 'touch';
-    else if(rnd() < (this.plan[t].atk === 'MO' ? .25 : .1)) choice = 'tap';
-    else choice = (dt < 6 && rnd() < .3) ? 'scrum' : 'touch';
+    else if(pg >= thr && !(dt <= 5 && this.plan[t].atk === 'AV' && diff < 0 && rnd() < .5)) choice = 'goal';
+    else if(dt <= 10 && g.scrum > .15 && rnd() < g.scrum) choice = 'scrum';
+    else if(dt <= 10 && rnd() < clamp(.75 + g.touch, .4, .95)) choice = 'touch';
+    else if(rnd() < (this.plan[t].atk === 'MO' || chase ? .25 : .1)) choice = 'tap';
+    else choice = (dt < 6 && rnd() < .3 + g.scrum) ? 'scrum' : 'touch';
+    if(chase && pg >= .58 && choice !== 'goal') this.log(`Mené de ${-diff} points, ${this.club[t].court} refuse les poteaux : il faut un essai.`, 'tac', t);
+    if(close && choice === 'goal' && pg < .58) this.log(`Match serré : ${this.club[t].court} prend les points.`, 'tac', t);
     if(choice === 'end'){ this.log(`${this.club[t].court} tape le ballon en touche : fin de la période.`, 'info', t); this.endHalf(); return; }
     if(choice === 'goal'){ this.banner('PÉNALITÉ', t, 'Tentative au but'); this.startGoalKick(t, x, y, 'pen'); return; }
     if(choice === 'scrum'){ this.log(`${this.club[t].court} choisit la mêlée.`, 'info', t); this.startScrum(c, r, t, 'choix après pénalité'); return; }
@@ -1877,6 +1914,14 @@ class Match {
       this.banner('MI-TEMPS', -1, `${this.score[0]} – ${this.score[1]}`);
       this.fx('whistleLong'); this.say(`C'est la mi-temps. ${this.club[0].court} ${this.score[0]}, ${this.club[1].court} ${this.score[1]}.`, 2);
       this.phase = 'halftime'; this.ph = {t:this.headless ? 1 : 12};
+      for(const t of [0, 1]){
+        const pre = this.gp[t], g = this.gamePlan(t, true);
+        for(const k in g.atk) g.atk[k] += pre.atk[k];
+        for(const k in g.def) g.def[k] += pre.def[k];
+        g.touch += pre.touch; g.scrum += pre.scrum; g.prev = pre.notes;
+        this.gp[t] = g;
+        if(g.notes.length) this.log(`🗒️ Consignes de la mi-temps pour ${this.club[t].court} : ${g.notes.join(' · ')}.`, 'tac', t);
+      }
     } else this.finish();
   }
   ph_halftime(){
@@ -2681,6 +2726,10 @@ function aiCard(id, m){
   const c = CLUB[id], T = DB.teams[id], Q = T.Q;
   let h = `<div class="card"><h4><span class="kit" style="width:10px;height:20px;background:linear-gradient(180deg,${c.c1} 60%,${c.c2} 60%)"></span>${c.nom}</h4>`;
   h += `<div class="small mut" style="margin-bottom:6px">${T.career.J} matchs d'expérience · niveau ${level(id)}</div>`;
+  const gp = m && m.gp && m.gp[m.ids.indexOf(id)];
+  if(gp){ const pre = gp.prev || gp.notes, mt = gp.prev ? gp.notes : [];
+    h += `<div class="small" style="margin:4px 0">🗒️ Plan de match : <span class="mut">${pre.join(' · ') || 'aucun ajustement particulier'}</span></div>` +
+      (gp.prev ? `<div class="small" style="margin:4px 0">Mi-temps : <span class="mut">${mt.join(' · ') || 'on garde le plan'}</span></div>` : ''); }
   h += `<div class="small" style="margin:4px 0">Attaque : gain estimé par possession</div><div class="qgrid"><div class="h"></div>${Object.keys(ATK_PLANS).map(k => `<div class="h">${ATK_SHORT[k]}</div>`).join('')}`;
   const all = Q.atk.flatMap(z => Object.values(z)), mn = Math.min(...all), mx = Math.max(...all);
   ZONES.forEach((zn, z) => {

@@ -30,6 +30,9 @@ Bancs d'essai : `python3 tests/banc-serveur.py` et `python3 appairage.py`, qui a
   - saison et terrain lourd ou sec, nocturnes, Tournoi des Six Nations ;
   - profil d'arbitre (arbitres fictifs).
 - **Stratégies** : 4 plans d'attaque (avants, large, au pied, mouvement) et 3 plans de défense (glissée, rush, grattage).
+- **Plan de match** : avant le coup d'envoi, chaque staff compare les forces des deux équipes (mêlée, vitesse, jeu au pied, touche, défense, discipline) et oriente ses plans d'attaque, sa défense et ses choix sur pénalité. Le plan est annoncé dans le commentaire et visible dans l'onglet IA.
+- **Consignes de la mi-temps** : chaque équipe corrige son plan selon la première période (mêlée ou touche en difficulté, ballons perdus au sol, franchissements encaissés, discipline, score).
+- **Gestion du score** : en fin de match, une équipe menée de plus d'un essai refuse les poteaux pour jouer la touche, et dans un match serré elle prend les points.
 - **Combinaisons de jeu** : croisée, redoublement, intrusion de l'arrière, ailier qui rentre, leurre, départ du n°8, ballon porté simulé. Les courses prévues sont tracées en pointillés, les équipes apprennent quelles combinaisons marchent pour elles, et la défense peut les lire.
 - **Apprentissage par renforcement** : chaque possession met à jour la valeur des plans selon la zone du terrain. S'y ajoutent de l'expérience (XP) et une progression des statistiques après chaque match.
 - **Championnat** : 26 journées, barème du Top 14 avec bonus, barrages, demi-finales et finale, palmarès.
