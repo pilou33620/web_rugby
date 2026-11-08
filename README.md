@@ -22,10 +22,12 @@ Tout tient dans un seul fichier : `index.html` (HTML, CSS et JavaScript, sans d�
   - saison et terrain lourd ou sec, nocturnes, Tournoi des Six Nations ;
   - profil d'arbitre (arbitres fictifs).
 - **Stratégies** : 4 plans d'attaque (avants, large, au pied, mouvement) et 3 plans de défense (glissée, rush, grattage).
+- **Combinaisons de jeu** : croisée, redoublement, intrusion de l'arrière, ailier qui rentre, leurre, départ du n°8, ballon porté simulé. Les courses prévues sont tracées en pointillés, les équipes apprennent quelles combinaisons marchent pour elles, et la défense peut les lire.
 - **Apprentissage par renforcement** : chaque possession met à jour la valeur des plans selon la zone du terrain. S'y ajoutent de l'expérience (XP) et une progression des statistiques après chaque match.
 - **Championnat** : 26 journées, barème du Top 14 avec bonus, barrages, demi-finales et finale, palmarès.
 - **Lecture du jeu** :
   - flèches de passe, trajectoires des coups de pied, ligne d'avantage ;
+  - courses de tous les joueurs affichées en permanence (bouton 🧭 Courses) ;
   - nom du porteur, mini-carte, réalisation télé ;
   - ralenti automatique sur les essais.
 - **Ambiance** : son du stade généré par le navigateur et voix du commentateur (synthèse vocale).
