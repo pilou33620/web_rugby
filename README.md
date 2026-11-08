@@ -4,6 +4,14 @@ Simulateur de rugby autonome du Top 14 (saison 2026-2027), avec un rendu en hexa
 
 Tout tient dans un seul fichier : `index.html` (HTML, CSS et JavaScript, sans dépendance). Il suffit de l'ouvrir dans un navigateur.
 
+## Lancer
+
+- **Par web_launcher** : carte Rugby Top 14 (port 8796). Depuis un autre appareil, ouvrez l'adresse par l'IP du Pi ; le code d'appairage demandé une fois s'affiche sur la carte, et HTTPS demande d'installer la CA (`/appairage/ca.pem`).
+- **Avec le serveur** : `python3 serveur.py [--port 8796] [--local] [--sans-navigateur] [--sans-pause] [--sans-maj]`. Python 3.8+, bibliothèque standard seulement. Sans `--sans-maj`, il se met à jour depuis GitHub au démarrage. Il ne sert que `index.html` et ne stocke rien.
+- **Localement** : ouvrez `index.html` dans un navigateur.
+
+Bancs d'essai : `python3 tests/banc-serveur.py` et `python3 appairage.py`, qui affichent `OK`.
+
 ## Fonctionnalités
 
 - **Les 14 clubs 2026-2027** avec leurs vrais effectifs (30 joueurs par club) et leurs statistiques : passe, mêlée, attaque, défense, rapidité, touche, jeu au pied, discipline.
@@ -40,6 +48,8 @@ La mémoire (expérience, classement, infirmerie) est gardée dans le navigateur
 |---|---|
 | `index.html` | Le simulateur complet. Les effectifs y sont intégrés. |
 | `squads/*.json` | Effectifs sources par club : nom, poste, titulaire, international, sources. |
+| `serveur.py`, `appairage.py` | Serveur pour web_launcher et le réseau local ; `appairage.py` est une copie de celui de web_suite. |
+| `tests/banc-serveur.py` | Banc du serveur : ce qu'il sert, ce qu'il refuse. |
 | `tests/audit.py` | Audit automatique : joue N matchs sans affichage et contrôle l'intégrité et le réalisme. |
 
 ## Lancer l'audit
