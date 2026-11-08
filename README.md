@@ -1,6 +1,6 @@
 # web_rugby
 
-Jeu et simulateur de rugby du Top 14 (saison 2026-2027), avec un rendu en hexagones et en vue isométrique. Les matchs se jouent seuls, ou vous dirigez un des deux clubs ; les équipes gagnent en expérience au fil des victoires et des défaites.
+Simulateur de rugby autonome du Top 14 (saison 2026-2027), avec un rendu en hexagones et en vue isométrique. Ce n'est pas un jeu : les matchs se jouent seuls et les équipes gagnent en expérience au fil des victoires et des défaites.
 
 Tout tient dans un seul fichier : `index.html` (HTML, CSS et JavaScript, sans dépendance). Il suffit de l'ouvrir dans un navigateur.
 
@@ -29,12 +29,6 @@ Bancs d'essai : `python3 tests/banc-serveur.py` et `python3 appairage.py`, qui a
   - météo (pluie, vent, chaleur, brouillard, froid) avec effet sur le jeu et à l'écran ;
   - saison et terrain lourd ou sec, nocturnes, Tournoi des Six Nations ;
   - profil d'arbitre (arbitres fictifs).
-- **Mode jeu** (barre sous les commandes : « 🎮 Je dirige … ») :
-  - vous imposez le plan d'attaque et de défense de votre club, ou laissez l'IA choisir ;
-  - vous choisissez la combinaison du prochain lancement (ruck, mêlée ou touche) ;
-  - à chaque pénalité pour vous, le jeu s'arrête : poteaux (avec la probabilité de réussite), pénaltouche, mêlée, jeu rapide, ou fin de période après la sirène. Le choix conseillé est en jaune ;
-  - avec « Diriger le porteur », le jeu s'arrête à chaque fois que votre porteur doit décider : courir, percuter, passer à un partenaire précis (libre ou marqué), jouer au pied (touche, long, chandelle, rasant), drop, ou laisser l'IA ;
-  - la composition, les remplacements et la progression restent automatiques. En choisissant « Mon club » dans le championnat, vous le dirigez d'office.
 - **Stratégies** : 4 plans d'attaque (avants, large, au pied, mouvement) et 3 plans de défense (glissée, rush, grattage).
 - **Combinaisons de jeu** : croisée, redoublement, intrusion de l'arrière, ailier qui rentre, leurre, départ du n°8, ballon porté simulé. Les courses prévues sont tracées en pointillés, les équipes apprennent quelles combinaisons marchent pour elles, et la défense peut les lire.
 - **Apprentissage par renforcement** : chaque possession met à jour la valeur des plans selon la zone du terrain. S'y ajoutent de l'expérience (XP) et une progression des statistiques après chaque match.
