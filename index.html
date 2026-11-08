@@ -78,6 +78,14 @@ button,select{font:inherit;color:inherit}
 #tabs button.on{color:var(--txt);border-bottom-color:var(--acc)}
 .tabbody{padding:10px}
 .hide{display:none!important}
+#coach{display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px;font-size:12.5px}
+#coach select{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:7px 8px}
+#coach.spect .cc{display:none}
+#decision{position:absolute;left:8px;right:8px;bottom:8px;background:#0d1526f2;border:2px solid var(--acc);border-radius:12px;padding:10px;max-height:70%;overflow:auto}
+#decision{padding:8px}
+#decision .dbtns{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;align-items:center}
+#decision .btn{padding:5px 9px;font-size:12.5px}
+#decision .g{width:100%;font-size:11px;color:var(--mut);margin-top:2px}
 /* Commentaire */
 #log{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
 #log li{display:grid;grid-template-columns:34px 1fr;gap:6px;padding:5px 6px;border-radius:8px;background:var(--panel2);font-size:13px;line-height:1.35;border-left:3px solid transparent}
@@ -159,6 +167,7 @@ details summary{cursor:pointer;color:var(--mut);font-size:12.5px}
         <button id="zOut">－</button>
       </div>
       <div id="banner"></div>
+      <div id="decision" class="hide" role="dialog" aria-label="Décision à prendre"></div>
       <div id="overlayStart"><div><b>Prêt pour le coup d'envoi</b><br><span class="mut small">Match d'environ 9 minutes à ×1. Les équipes apprennent de chaque victoire et de chaque défaite.</span></div></div>
     </div>
     <div id="controls">
@@ -176,6 +185,13 @@ details summary{cursor:pointer;color:var(--mut);font-size:12.5px}
         <button class="btn tog on" id="btnRuns" title="Afficher les courses de tous les joueurs">🧭 Courses</button>
       </div>
       <div class="seg" id="speed"><button data-s="0.5">×½</button><button data-s="1" class="on">×1</button><button data-s="2">×2</button><button data-s="4">×4</button><button data-s="12">⏭</button></div>
+    </div>
+    <div id="coach" class="spect">
+      <select id="selCtl" aria-label="Équipe que vous dirigez"></select>
+      <span class="cc">Attaque</span><div class="seg cc" id="segAtk"></div>
+      <span class="cc">Défense</span><div class="seg cc" id="segDef"></div>
+      <select id="selCombo" class="cc" aria-label="Combinaison au prochain lancement"></select>
+      <button class="btn tog cc" id="btnCarry" title="Le jeu s'arrête à chaque fois que votre porteur doit décider">🎮 Diriger le porteur</button>
     </div>
   </div>
   <aside id="side">
@@ -443,6 +459,8 @@ class Match {
     this.P = [];
     this.st = [newStats(), newStats()];
     this.plan = [{atk:CLUB[hid].style, def:CLUB[hid].dstyle}, {atk:CLUB[aid].style, def:CLUB[aid].dstyle}];
+    // jeu : équipe dirigée par le joueur (-1 = aucune), consignes et décision en attente
+    this.human = -1; this.carryCtl = false; this.forceAtk = null; this.forceDef = null; this.nextCombo = null; this.pending = null; this.order = null;
     this.ball = {state:'dead', x:HALFWAY, y:MID_Y, z:0};
     this.poss = -1; this.pr = null; this.phasePasses = 0;
     this.phase = 'init'; this.ph = {}; this.over = false;
@@ -782,8 +800,10 @@ class Match {
   }
   choosePlans(t){
     const o = 1 - t, z = this.zoneOf(t, this.ballX());
-    const a = this.softmaxPick(this.Q[t].atk[z], this.ctxBias(t, z));
-    const df = this.softmaxPick(this.Q[o].def[z]);
+    let a = this.softmaxPick(this.Q[t].atk[z], this.ctxBias(t, z));
+    let df = this.softmaxPick(this.Q[o].def[z]);
+    if(t === this.human && this.forceAtk) a = this.forceAtk;
+    if(o === this.human && this.forceDef) df = this.forceDef;
     if(this.plan[t].atk !== a && rnd() < .12) this.log(`${this.club[t].court} bascule en « ${ATK_PLANS[a]} ».`, 'tac', t);
     this.plan[t].atk = a; this.plan[o].def = df;
     if(this.pr && this.pr.team === t){ this.pr.ent.push([z, a]); this.pr.dent.push([z, df]); }
@@ -898,7 +918,8 @@ class Match {
     if(this.inOppIngoal(c)){ this.scoreTry(c); return; }
     if(this.combo && (this.combo.t !== t || (this.combo.done && this.tickN > this.combo.doneT + 2))) this.combo = null;
     const scripted = this.combo && !this.combo.done;
-    if(scripted ? this.comboTick(c) : (c.hold <= 0 && this.decide(c))){
+    if(!scripted && c.hold <= 0 && t === this.human && this.carryCtl && !this.order){ this.pending = {kind:'carry', c}; return; }
+    if(scripted ? this.comboTick(c) : (c.hold <= 0 && (this.order ? this.doOrder(c) : this.decide(c)))){
       // après une passe instantanée, le jeu continue autour du receveur
       if(this.phase !== 'open' || this.ball.state !== 'carried') return;
       const nc = this.ball.carrier, ov2 = new Map();
@@ -1013,6 +1034,21 @@ class Match {
     c.lineMode = false;
     return false;
   }
+  // ordre du joueur pour le porteur (choisi pendant la pause)
+  doOrder(c){
+    const o = this.order; this.order = null;
+    if(o.c !== c) return this.decide(c);
+    c.intent = null;
+    switch(o.a){
+      case 'pass': if(this.validPass(c, o.m, 8)){ this.passBall(c, o.m); return true; } return false;
+      case 'kick': this.kickChoice(c, o.k); return true;
+      case 'drop': this.dropGoal(c); return true;
+      case 'run': c.hold = 3; return false;
+      case 'crash': c.crash = true; c.hold = 6; return false;
+      default: return this.decide(c);
+    }
+  }
+  passOptions(c){ return this.P.filter(m => m.team === c.team && m !== c && this.validPass(c, m, 8)).sort((a, b) => hdp(a, c) - hdp(b, c)).slice(0, 5); }
   validPass(c, m, range){
     const d = this.dir(c.team), dist = hdp(c, m);
     return m.state === 'up' && dist >= 1 && dist <= range && d * (m.x - c.x) <= .05;
@@ -1138,6 +1174,7 @@ class Match {
   maybeCombo(t, ctxk, x){
     const plan = this.plan[t].atk, dt = this.dTry(t, x);
     if(dt < 3 || this.hooter()) return null;
+    if(t === this.human && this.nextCombo){ const k = this.nextCombo; if(COMBOS[k].ctx.includes(ctxk)){ this.nextCombo = null; return k; } }
     const rate = {LA:.38, MO:.32, PI:.15, AV:.12}[plan] * (ctxk === 'ruck' ? 1 : 1.3);
     if(rnd() > rate) return null;
     const q = this.Q[t].combo || freshComboQ(this.club[t]), opts = {};
@@ -1309,6 +1346,7 @@ class Match {
     const diff = this.score[t] - this.score[o];
     if(this.hooter()) return diff > 0 ? 'touchout' : 'ten';
     if(dt <= 2.5) return rnd() < .7 ? 'pick' : 'fw';
+    if(t === this.human && this.nextCombo) return 'ten';
     if(this.half === 2 && this.halfTick > this.halfTicks * .85 && diff <= 0 && diff >= -3 && dt <= 13 && rnd() < .35) return 'drop10';
     if(dt > 29 && rnd() < .35) return rnd() < .55 ? 'box' : 'kick10';
     if(dt > 18.5 && plan !== 'PI' && rnd() < (plan === 'MO' ? .08 : .15)) return 'box';      // chandelle de pression
@@ -1323,6 +1361,7 @@ class Match {
   setPieceIntent(t, x){
     const plan = this.plan[t].atk, dt = this.dTry(t, x);
     if(this.hooter()) return this.score[t] > this.score[1 - t] ? 'touchout' : 'ten';
+    if(t === this.human && this.nextCombo) return 'ten';
     if(plan === 'PI' && dt > 18.5) return rnd() < .45 ? 'box' : rnd() < .75 ? 'kick10' : 'ten';
     if(dt > 29 && rnd() < .4) return 'kick10';
     if(plan === 'AV') return rnd() < .45 ? 'fw' : 'ten';
@@ -1772,6 +1811,12 @@ class Match {
     else if(dt <= 10 && rnd() < .75) choice = 'touch';
     else if(rnd() < (this.plan[t].atk === 'MO' ? .25 : .1)) choice = 'tap';
     else choice = (dt < 6 && rnd() < .3) ? 'scrum' : 'touch';
+    const A = {t, c, r, x, y, kicker, pg, ai:choice};
+    if(t === this.human){ this.penAsk = A; this.pending = {kind:'pen'}; this.phase = 'penask'; return; }
+    this.penGo(choice, A);
+  }
+  ph_penask(){}
+  penGo(choice, {t, c, r, x, y, kicker}){
     if(choice === 'end'){ this.log(`${this.club[t].court} tape le ballon en touche : fin de la période.`, 'info', t); this.endHalf(); return; }
     if(choice === 'goal'){ this.banner('PÉNALITÉ', t, 'Tentative au but'); this.startGoalKick(t, x, y, 'pen'); return; }
     if(choice === 'scrum'){ this.log(`${this.club[t].court} choisit la mêlée.`, 'info', t); this.startScrum(c, r, t, 'choix après pénalité'); return; }
@@ -1904,6 +1949,7 @@ class Match {
       case 'lineout': return 'Touche';
       case 'maul': return 'Maul';
       case 'penwait': return 'Pénalité';
+      case 'penask': return 'Pénalité : à vous de choisir';
       case 'goal': return this.ph.type === 'conv' ? 'Transformation' : 'Pénalité au but';
       case 'celebrate': return 'Essai !';
       case 'halftime': return 'Mi-temps';
@@ -2429,6 +2475,57 @@ function fillSelects(){
     sel.innerHTML = CLUBS.map(c => `<option value="${c.id}">${c.nom}</option>`).join('');
   }
   $('selH').value = 'UBB'; $('selA').value = 'TOU';
+  $('segAtk').innerHTML = `<button data-v="" class="on">IA</button>` + Object.entries(ATK_SHORT).map(([k, v]) => `<button data-v="${k}" title="${ATK_PLANS[k]}">${v}</button>`).join('');
+  $('segDef').innerHTML = `<button data-v="" class="on">IA</button>` + Object.entries(DEF_SHORT).map(([k, v]) => `<button data-v="${k}" title="${DEF_PLANS[k]}">${v}</button>`).join('');
+  $('selCombo').innerHTML = `<option value="">Combinaison : au choix de l'IA</option>` + COMBO_KEYS.map(k => `<option value="${k}">Prochain lancement : ${COMBOS[k].nom}</option>`).join('');
+}
+// ----- Jeu : consignes de l'entraîneur et décisions -----
+const segVal = id => { const b = $(id).querySelector('.on'); return b && b.dataset.v || null; };
+function applyCoach(){
+  const m = match; if(!m) return;
+  const v = $('selCtl').value;
+  m.human = v === '' ? -1 : +v; m.forceAtk = segVal('segAtk'); m.forceDef = segVal('segDef');
+  m.nextCombo = $('selCombo').value || null; m.carryCtl = $('btnCarry').classList.contains('on');
+  $('coach').classList.toggle('spect', m.human < 0);
+  // plus personne pour décider : l'IA reprend la main
+  if(m.pending && (m.human < 0 || (m.pending.kind === 'carry' && !m.carryCtl))) resolvePending('ai');
+}
+function resolvePending(k, extra){
+  const m = match, P = m.pending; if(!P) return;
+  m.pending = null;
+  if(P.kind === 'pen') m.penGo(k === 'ai' ? m.penAsk.ai : k, m.penAsk);
+  else m.order = {c:P.c, a:k, ...extra};
+}
+for(const id of ['segAtk', 'segDef']) $(id).onclick = e => { const b = e.target.closest('button'); if(!b) return; [...$(id).children].forEach(x => x.classList.toggle('on', x === b)); applyCoach(); };
+$('selCtl').onchange = $('selCombo').onchange = applyCoach;
+$('btnCarry').onclick = () => { $('btnCarry').classList.toggle('on'); applyCoach(); };
+let shownPending = null;
+function renderDecision(){
+  const m = match, P = m && m.pending, el = $('decision');
+  if(P === shownPending) return; shownPending = P;
+  if(!P){ el.classList.add('hide'); return; }
+  const acts = [];   // [libellé, action, conseillé, groupe]
+  let head;
+  if(P.kind === 'pen'){
+    const A = m.penAsk, me = m.club[A.t].court;
+    head = `<b>Pénalité pour ${me}</b> · à ${Math.round(m.dTry(A.t, A.x) * M_PER_U)} m de l'en-but · ${m.score[A.t]} – ${m.score[1 - A.t]}${m.hooter() ? ' · <span style="color:#ff5d5d">sirène</span>' : ''}`;
+    acts.push([`🎯 Tenter les poteaux (${Math.round(A.pg * 100)} %)`, 'goal'], ['📐 Pénaltouche', 'touch'], ['⚔️ Mêlée', 'scrum'], ['⚡ Jouer vite à la main', 'tap']);
+    if(m.hooter()) acts.push(['⏱️ Taper en touche : fin de la période', 'end']);
+    acts.forEach(a => a[2] = a[1] === A.ai);
+  } else {
+    const c = P.c, t = c.team, dt = m.dTry(t, c.x), md = m.minOppDist(c);
+    head = `<b>🏉 ${c.nom || ROLES[c.num].n} (n°${c.num})</b> · à ${Math.round(dt * M_PER_U)} m de l'en-but · ${md <= 1 ? 'plaqueur au contact' : md <= 2 ? 'défenseur tout proche' : md <= 3 ? 'défense à 2-3 m' : 'de l\'espace devant'}`;
+    acts.push(['🏃 Courir', 'run', 0, 'Porter le ballon'], ['💥 Percuter', 'crash', 0, 'Porter le ballon'], ['🤖 Laisser l\'IA décider', 'ai', 0, 'Porter le ballon']);
+    for(const mt of m.passOptions(c)) acts.push([`↩️ n°${mt.num} ${mt.nom || ROLES[mt.num].n} · ${m.minOppDist(mt) >= 3 ? 'libre' : 'marqué'}`, 'pass', 0, 'Passe', {m:mt}]);
+    acts.push(['Trouver la touche', 'kick', 0, 'Jeu au pied', {k:'touch'}], ['Long dans le fond', 'kick', 0, 'Jeu au pied', {k:'long'}],
+      ['Chandelle', 'kick', 0, 'Jeu au pied', {k:c.num === 9 ? 'box' : 'bomb'}], ['Rasant à suivre', 'kick', 0, 'Jeu au pied', {k:'grubber'}]);
+    if(dt <= 14 && dt >= 2) acts.push(['🎯 Drop', 'drop', 0, 'Jeu au pied']);
+  }
+  let h = `<div class="small">${head}</div><div class="dbtns">`, g = null;
+  acts.forEach((a, i) => { if(a[3] && a[3] !== g){ g = a[3]; h += `<div class="g">${g}</div>`; } h += `<button class="btn${a[2] ? ' primary' : ''}" data-i="${i}"${a[2] ? ' title="Choix conseillé"' : ''}>${a[0]}</button>`; });
+  el.innerHTML = h + `</div>`;
+  el.querySelectorAll('button').forEach(b => b.onclick = () => { const a = acts[b.dataset.i]; resolvePending(a[1], a[4]); renderDecision(); });
+  el.classList.remove('hide'); el.querySelector('button').focus({preventScroll:true});
 }
 function monthForJ(j){ return MOIS_SAISON[Math.min(9, Math.floor(j / 26 * 10))]; }
 function newMatch(h, a, fixture = null){
@@ -2436,6 +2533,9 @@ function newMatch(h, a, fixture = null){
   match = new Match(h, a, {month:mo, weather:$('selWx').value});
   try{ speechSynthesis.cancel(); }catch(e){}
   liveFixture = fixture;
+  const ctl = $('selCtl'), keep = DB.my && match.ids.includes(DB.my) ? String(match.ids.indexOf(DB.my)) : ctl.value;
+  ctl.innerHTML = `<option value="">👀 Spectateur (simulation)</option>` + match.club.map((c, i) => `<option value="${i}">🎮 Je dirige ${c.nom}</option>`).join('');
+  ctl.value = keep; applyCoach();
   buildField(h);
   logIdx = 0; ended = false; acc = 0; running = false; replay = null; snaps = []; curDur = TICK_MS; $('stage').classList.remove('replay');
   $('log').innerHTML = '';
@@ -2522,10 +2622,11 @@ function updateHUD(force){
   $('clock').innerHTML = m.over ? '<b>Terminé</b>' : `<b>${mm}:${ss}</b>${m.hooter() ? ' <span style="color:#ff5d5d">sirène</span>' : ''} · ${m.half === 1 ? '1re' : '2e'} mi-temps`;
   for(const t of [0, 1]){
     const el = $(t ? 'aPlan' : 'hPlan'), pl = m.plan[t];
-    el.innerHTML = `<span class="k">${m.club[t].court}${m.poss === t ? ' 🏉' : ''}</span><span class="l2">Att. <b>${ATK_SHORT[pl.atk]}</b> · Déf. <b>${DEF_SHORT[pl.def]}</b></span>`;
+    el.innerHTML = `<span class="k">${t === m.human ? '🎮 ' : ''}${m.club[t].court}${m.poss === t ? ' 🏉' : ''}</span><span class="l2">Att. <b>${ATK_SHORT[pl.atk]}</b> · Déf. <b>${DEF_SHORT[pl.def]}</b></span>`;
     el.style.borderLeft = `3px solid ${col[t].c1 === '#f2f2f2' ? '#ccc' : col[t].c1}`;
   }
   $('phase').textContent = m.phaseLabel();
+  if(!m.nextCombo && $('selCombo').value) $('selCombo').value = '';   // combinaison lancée
   if(m.bannerQ && m.bannerQ !== lastBanner){
     lastBanner = m.bannerQ;
     const b = $('banner'), c = m.bannerQ.team >= 0 ? col[m.bannerQ.team].c1 : '#f4c430';
@@ -2575,7 +2676,7 @@ function loop(ts){
   if(replay && running){
     replay.t += dt * Math.min(speed, 2);
     while(replay && replay.t >= REPLAY_MS){ replay.t -= REPLAY_MS; if(++replay.i >= replay.frames.length){ replay = null; $('stage').classList.remove('replay'); } }
-  } else if(match && running && !match.over){
+  } else if(match && running && !match.over && !match.pending){
     acc += dt * speed;
     let n = 0;
     while(acc >= curDur && n++ < 40){
@@ -2589,9 +2690,10 @@ function loop(ts){
     if(match.over && !replay && !ended) onMatchEnd();
   }
   if(match && match.over && !replay && !ended) onMatchEnd();
+  renderDecision();
   drainSfx(); crowdTick(dt);
   if(replay) render(clamp(replay.t / REPLAY_MS, 0, 1), replay.frames[replay.i]);
-  else render(running ? clamp(acc / curDur, 0, 1) : 1);
+  else render(running && !(match && match.pending) ? clamp(acc / curDur, 0, 1) : 1);
   if(!loop.t || ts - loop.t > 120){ loop.t = ts; if(!replay){ pumpLog(); updateHUD(); } if(curTab === 'stats' && match) renderStats(); if(curTab === 'teams' && match && running) renderTeams(); }
   requestAnimationFrame(loop);
 }
