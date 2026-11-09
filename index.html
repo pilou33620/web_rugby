@@ -2383,11 +2383,11 @@ function drawMini(m, W, H, bp, col){
 // =====================================================================
 //  SON DU STADE & COMMENTATEUR (Web Audio + synthèse vocale du navigateur)
 // =====================================================================
-const AUD = {ctx:null, on:true, voice:true, gain:null, exc:0, frVoice:null};
+const AUD = {ctx:null, on:true, voice:true, gain:null, exc:0, frVoice:null, talkEnd:0, cur:null};
 // À appeler dans un geste (clic) : iPad/Android ne débloquent le son et la voix qu'à ce moment-là.
 function audioInit(){
   try{ navigator.audioSession.type = 'playback'; }catch(e){} // iOS 17+ : jouer même si l'interrupteur silencieux est activé
-  try{ if(!speechSynthesis.speaking){ const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } speechSynthesis.resume(); }catch(e){} // débloque la voix (iOS)
+  try{ if(!speechSynthesis.speaking){ const u = new SpeechSynthesisUtterance('Allez'); u.volume = 0; speechSynthesis.speak(u); } speechSynthesis.resume(); }catch(e){} // débloque la voix (iOS)
   if(AUD.ctx) { try{ AUD.ctx.resume(); }catch(e){} return; }
   try{
     const A = window.AudioContext || window.webkitAudioContext; if(!A) return;
@@ -2403,12 +2403,13 @@ function audioInit(){
     ac.resume(); // Safari crée parfois le contexte « suspended » même dans un clic
   }catch(e){ AUD.ctx = null; }
   try{
-    const pickV = () => { const vs = speechSynthesis.getVoices(); AUD.frVoice = vs.find(v => /^fr(-|_)FR/i.test(v.lang)) || vs.find(v => /^fr/i.test(v.lang)) || null; };
+    const pickV = () => { const vs = speechSynthesis.getVoices(); const fr = vs.filter(v => /^fr/i.test(v.lang)); AUD.frVoice = fr.find(v => v.localService && /^fr(-|_)FR/i.test(v.lang)) || fr.find(v => v.localService) || fr.find(v => /^fr(-|_)FR/i.test(v.lang)) || fr[0] || null; };
     pickV(); speechSynthesis.onvoiceschanged = pickV;
   }catch(e){}
 }
 function crowdTick(dt){
   if(!AUD.ctx || !AUD.gain) return;
+  if(AUD.ctx.state !== 'running' && AUD.ctx.state !== 'closed') AUD.ctx.resume().catch(() => {}); // iOS coupe le contexte (« interrupted ») quand la voix parle
   AUD.exc *= Math.exp(-dt / 1800);
   const target = AUD.on && running && match && !match.over ? .035 + AUD.exc * .22 : (AUD.on && match && match.over ? .03 : 0);
   try{ AUD.gain.gain.setTargetAtTime(target, AUD.ctx.currentTime, .25); }catch(e){}
@@ -2439,11 +2440,17 @@ function playSfx(e){
 function sayVoice(txt, prio){
   if(!AUD.voice || !window.speechSynthesis || speed > 2) return;
   try{
-    const ss = speechSynthesis;
-    if(ss.speaking || ss.pending){ if(prio < 2) return; ss.cancel(); }
-    const u = new SpeechSynthesisUtterance(txt);
+    const ss = speechSynthesis, now = performance.now();
+    // on suit nous-mêmes la parole : sur tablette ss.speaking/pending restent parfois bloqués à true
+    const busy = now < AUD.talkEnd;
+    if(busy && prio < 2) return;
+    if(busy) ss.cancel();
+    const u = AUD.cur = new SpeechSynthesisUtterance(txt); // gardée en mémoire, sinon Chrome peut la jeter avant onend
     u.lang = 'fr-FR'; if(AUD.frVoice) u.voice = AUD.frVoice; u.rate = 1.08; u.volume = 1;
-    ss.speak(u);
+    u.onend = u.onerror = () => { if(AUD.cur === u) AUD.talkEnd = 0; };
+    AUD.talkEnd = now + 1500 + txt.length * 90; // filet si onend n'arrive jamais
+    ss.resume();
+    if(busy) setTimeout(() => ss.speak(u), 80); else ss.speak(u); // Android ignore un speak() collé à cancel()
   }catch(e){}
 }
 function drainSfx(){
