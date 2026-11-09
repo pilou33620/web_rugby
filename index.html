@@ -182,7 +182,7 @@ details summary{cursor:pointer;color:var(--mut);font-size:12.5px}
       <button data-t="ia">IA</button>
       <button data-t="league">Championnat</button>
     </nav>
-    <div class="tabbody" id="tab-direct"><ul id="log"></ul></div>
+    <div class="tabbody" id="tab-direct"><button class="btn" id="btnCopyLog" title="Copier tout le journal du match" style="margin-bottom:6px">📋 Copier le journal</button><ul id="log"></ul></div>
     <div class="tabbody hide" id="tab-stats"></div>
     <div class="tabbody hide" id="tab-teams"></div>
     <div class="tabbody hide" id="tab-ia"></div>
@@ -2449,6 +2449,14 @@ $('btnStart').onclick = () => {
 $('btnPause').onclick = () => { running = !running; $('btnPause').textContent = running ? 'Pause' : 'Reprendre'; };
 $('speed').onclick = e => { const b = e.target.closest('button'); if(!b) return; speed = +b.dataset.s; [...$('speed').children].forEach(x => x.classList.toggle('on', x === b)); };
 $('btnSnd').onclick = () => { audioInit(); AUD.on = !AUD.on; $('btnSnd').classList.toggle('on', AUD.on); };
+$('btnCopyLog').onclick = () => {
+  // le journal s'affiche du plus récent au plus ancien : on le remet dans l'ordre du match
+  const txt = [...$('log').children].reverse().map(li => li.children[0].textContent + ' ' + li.children[1].textContent).join('\n');
+  const done = ok => { $('btnCopyLog').textContent = ok ? '✅ Copié !' : '❌ Copie impossible'; setTimeout(() => $('btnCopyLog').textContent = '📋 Copier le journal', 1500); };
+  // navigator.clipboard n'existe qu'en HTTPS ou localhost : repli pour l'accès par IP locale
+  const old = () => { const t = document.createElement('textarea'); t.value = txt; document.body.append(t); t.select(); let ok = false; try{ ok = document.execCommand('copy'); }catch(e){} t.remove(); done(ok); };
+  if(navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(txt).then(() => done(true), old); else old();
+};
 $('btnVoice').onclick = () => { audioInit(); AUD.voice = !AUD.voice; $('btnVoice').classList.toggle('on', AUD.voice); if(!AUD.voice) try{ speechSynthesis.cancel(); }catch(e){} };
 $('btnRuns').onclick = () => { showRuns = !showRuns; $('btnRuns').classList.toggle('on', showRuns); };
 $('selMonth').onchange = $('selWx').onchange = () => { if(!running){ newMatch($('selH').value, $('selA').value); refreshTabs(); } };
