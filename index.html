@@ -2384,7 +2384,10 @@ function drawMini(m, W, H, bp, col){
 //  SON DU STADE & COMMENTATEUR (Web Audio + synthèse vocale du navigateur)
 // =====================================================================
 const AUD = {ctx:null, on:true, voice:true, gain:null, exc:0, frVoice:null};
+// À appeler dans un geste (clic) : iPad/Android ne débloquent le son et la voix qu'à ce moment-là.
 function audioInit(){
+  try{ navigator.audioSession.type = 'playback'; }catch(e){} // iOS 17+ : jouer même si l'interrupteur silencieux est activé
+  try{ if(!speechSynthesis.speaking){ const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } speechSynthesis.resume(); }catch(e){} // débloque la voix (iOS)
   if(AUD.ctx) { try{ AUD.ctx.resume(); }catch(e){} return; }
   try{
     const A = window.AudioContext || window.webkitAudioContext; if(!A) return;
@@ -2397,6 +2400,7 @@ function audioInit(){
     const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 750; bp.Q.value = .5;
     const g = AUD.gain = ac.createGain(); g.gain.value = 0;
     src.connect(bp); bp.connect(g); g.connect(ac.destination); src.start();
+    ac.resume(); // Safari crée parfois le contexte « suspended » même dans un clic
   }catch(e){ AUD.ctx = null; }
   try{
     const pickV = () => { const vs = speechSynthesis.getVoices(); AUD.frVoice = vs.find(v => /^fr(-|_)FR/i.test(v.lang)) || vs.find(v => /^fr/i.test(v.lang)) || null; };
@@ -2479,13 +2483,12 @@ function newMatch(h, a, fixture = null){
 }
 function startMatch(){
   if(!match || match.over || ended){ const h = $('selH').value, a = $('selA').value; newMatch(h, a, liveFixture && liveFixture.h === h && liveFixture.a === a ? liveFixture : null); }
-  running = true;
+  running = true; audioInit(); // startMatch est toujours appelé depuis un clic (Coup d'envoi, Regarder le match)
   $('overlayStart').classList.add('hide');
   $('btnStart').textContent = 'Recommencer';
   $('btnPause').disabled = false;
 }
 $('btnStart').onclick = () => {
-  audioInit();
   if(running || (match && match.tickN > 0)){ const h = $('selH').value, a = $('selA').value; newMatch(h, a, liveFixture && liveFixture.h === h && liveFixture.a === a ? liveFixture : null); }
   startMatch();
 };
