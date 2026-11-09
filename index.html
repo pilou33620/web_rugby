@@ -432,7 +432,7 @@ class Match {
     this.halfTicks = opts.halfTicks || 1060;    // ≈ 9 min 30 de match à ×1 (230 ms par instant + ralentis)
     this.events = []; this.bannerQ = null;
     this.tickN = 0; this.half = 1; this.halfTick = 0;
-    this.score = [0, 0]; this.tries = [0, 0];
+    this.score = [0, 0]; this.tries = [0, 0]; this.tmoN = 0;
     this.left = rnd() < .5 ? 0 : 1;          // équipe qui attaque vers +x
     this.firstKick = rnd() < .5 ? 0 : 1;
     this.occ = new Int16Array(COLS * ROWS).fill(-1);
@@ -827,7 +827,7 @@ class Match {
       if(p.state === 'bin' && this.phase !== 'halftime' && --p.binT <= 0 && this.phase !== 'arrange') this.returnFromBin(p);
     }
     // filet de sécurité : la sirène a retenti depuis trop longtemps
-    if(this.halfTick > this.halfTicks + 160 && !['goal','celebrate','halftime','end'].includes(this.phase)){
+    if(this.halfTick > this.halfTicks + 160 && !['goal','celebrate','tmo','halftime','end'].includes(this.phase)){
       this.log(`L'arbitre siffle : ballon injouable, c'est terminé pour cette période.`, 'info');
       this.endHalf(); return;
     }
@@ -1845,8 +1845,16 @@ class Match {
     if(this.hooter()){ this.endHalf(); return; }
     this.startKickoff(1 - t);
   }
-  scoreTry(p, onLine = false){
+  scoreTry(p, onLine = false, checked = false){
     const t = p.team;
+    if(!checked && rnd() < (onLine ? .3 : .12)){   // essai litigieux : l'arbitre demande la vidéo
+      this.ball = {state:'dead', x:p.x, y:p.y, z:0}; this.slow(2); this.tmoN++;
+      for(const q of this.P) if(q.state !== 'up' && this.active(q)){ q.state = 'up'; q.groundT = 0; }
+      this.log(`L'arbitre a un doute : arbitrage vidéo (TMO) sur l'action du ${this.pn(p)}…`, 'info', t);
+      this.banner('TMO', t, 'Essai en attente…'); this.fx('whistle');
+      this.say(`L'arbitre demande la vidéo. Suspense…`, 2);
+      this.phase = 'tmo'; this.ph = {t:this.headless ? 1 : 10, p, onLine}; return;
+    }
     this.addPoints(t, 5); this.tries[t]++; this.st[t].tries++; this.slow(2);
     this.fx('try', t);
     this.say(`Essai ! ${this.spk(p)} aplatit pour ${this.club[t].court} ! ${this.score[0]} à ${this.score[1]}.`, 2);
@@ -1856,6 +1864,17 @@ class Match {
     for(const q of this.P) if(q.state !== 'up' && this.active(q)){ q.state = 'up'; q.groundT = 0; }
     this.phase = 'celebrate';
     this.ph = {t:7, scorer:p, then:() => this.startGoalKick(t, 0, p.y, 'conv')};
+  }
+  ph_tmo(){
+    if(--this.ph.t > 0) return;
+    const {p, onLine} = this.ph, t = p.team, o = 1 - t;
+    if(rnd() >= .35){ this.log(`Après vidéo : essai accordé !`, 'info', t); this.scoreTry(p, onLine, true); return; }
+    const foot = rnd() < .4;
+    this.log(`Après vidéo : ESSAI REFUSÉ, ${foot ? 'pied en touche' : 'en-avant au moment d\'aplatir'} du ${this.pn(p)}.`, 'turn', o);
+    this.banner('ESSAI REFUSÉ', o, foot ? 'Pied en touche' : 'En-avant');
+    this.say(`L'essai est refusé !`, 2);
+    if(foot) this.startLineout(p.x, p.y < FIELD_W / 2, o);
+    else { const [c, r] = toHex(p.x, p.y); this.startScrum(c, r, o, 'en-avant'); }
   }
   ph_celebrate(){
     const C = this.ph;
@@ -1902,6 +1921,7 @@ class Match {
       case 'penwait': return 'Pénalité';
       case 'goal': return this.ph.type === 'conv' ? 'Transformation' : 'Pénalité au but';
       case 'celebrate': return 'Essai !';
+      case 'tmo': return 'Arbitrage vidéo…';
       case 'halftime': return 'Mi-temps';
       case 'end': return 'Terminé';
       case 'open': return b.state === 'flight' ? (b.kind === 'pass' ? 'Passe' : 'Ballon en l\'air') : b.state === 'loose' ? 'Ballon au sol' : 'Jeu courant';
@@ -2152,7 +2172,7 @@ function render(al, view){
   if(cam.mode === 'follow' || view){
     let tvz = 1;
     if(!view){
-      if(['arrange', 'kickwait', 'scrum', 'lineout', 'goal', 'penwait', 'celebrate', 'halftime'].includes(m.phase)) tvz = .72;
+      if(['arrange', 'kickwait', 'scrum', 'lineout', 'goal', 'penwait', 'celebrate', 'tmo', 'halftime'].includes(m.phase)) tvz = .72;
       else if(m.ball.state === 'flight' && m.ball.kind !== 'pass') tvz = .66;
       else if(m.ball.carrier && m.ball.carrier.burst > 0) tvz = 1.15;
     }
@@ -2577,10 +2597,10 @@ function loop(ts){
     let n = 0;
     while(acc >= curDur && n++ < 40){
       acc -= curDur;
-      const tr = match.tries[0] + match.tries[1];
-      match.step(); snap();
+      const tr = match.tries[0] + match.tries[1] + match.tmoN;
+      match.step(); if(match.phase !== 'tmo') snap();
       curDur = TICK_MS * (match.dur || 1);
-      if(match.tries[0] + match.tries[1] > tr && speed <= 2){ startReplay(); acc = 0; break; }
+      if(match.tries[0] + match.tries[1] + match.tmoN > tr && speed <= 2){ startReplay(); acc = 0; break; }
       if(match.over) break;
     }
     if(match.over && !replay && !ended) onMatchEnd();
