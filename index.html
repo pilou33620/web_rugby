@@ -2487,7 +2487,6 @@ function pumpLog(){
     frag.prepend(li);
   }
   $('log').prepend(frag);
-  while($('log').children.length > 160) $('log').lastChild.remove();
 }
 function addLearnLog(txt){ const li = document.createElement('li'); li.className = 'learn'; li.innerHTML = `<span class="m">IA</span><span></span>`; li.lastChild.textContent = txt; $('log').prepend(li); }
 
