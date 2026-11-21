@@ -1,17 +1,18 @@
 name: bancs d'essai
-on: [push, pull_request]
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
 jobs:
   essais:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: '3.12' }
-      - name: Serveur — fichiers servis, Host
-        run: python tests/banc-serveur.py
-      - name: Appairage — code, jeton et cookie partagés
-        run: python appairage.py
-      - name: appairage.py est le même que celui de web_suite
-        run: |
-          git clone --quiet --depth 1 https://github.com/pilou33620/web_suite.git ../web_suite
-          diff <(tr -d '\r' < ../web_suite/lanceur/appairage.py) <(tr -d '\r' < appairage.py)
+
+      # le serveur : options du catalogue, page servie, fichiers refusés, Host, méthodes, en-têtes
+      - name: Serveur (Rust)
+        run: cargo test -p rugby

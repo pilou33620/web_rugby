@@ -1,2 +1,6 @@
 __pycache__/
 *.py[cod]
+
+# Rust : compilation et exécutables (compilés ici ou téléchargés)
+/target/
+/bin/
