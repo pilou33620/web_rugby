@@ -7,10 +7,22 @@ Tout tient dans un seul fichier : `index.html` (HTML, CSS et JavaScript, sans d�
 ## Lancer
 
 - **Par web_launcher** : carte Rugby Top 14 (port 8796). Depuis un autre appareil, ouvrez l'adresse par l'IP du Pi ; le code d'appairage demandé une fois s'affiche sur la carte, et HTTPS demande d'installer la CA (`/appairage/ca.pem`).
-- **Avec le serveur** : `python3 serveur.py [--port 8796] [--local] [--sans-navigateur] [--sans-pause] [--sans-maj]`. Python 3.8+, bibliothèque standard seulement. Sans `--sans-maj`, il se met à jour depuis GitHub au démarrage. Il ne sert que `index.html` et ne stocke rien.
+- **Avec le serveur** : `./lancer.sh` (Linux, macOS, Raspberry Pi) ou `lancer.bat` (Windows). Le serveur est en Rust ; Rust n'est pas nécessaire : sans `cargo`, `binaires.sh` / `binaires.cmd` téléchargent l'exécutable du système (publication GitHub « binaires », compilée par la CI à chaque envoi sur `main`, vérifiée par son empreinte SHA-256) dans `bin/`. Avec `cargo`, il est compilé sur place. Le serveur ne sert que `index.html` et ne stocke rien.
 - **Localement** : ouvrez `index.html` dans un navigateur.
 
-Bancs d'essai : `python3 tests/banc-serveur.py` et `python3 appairage.py`, qui affichent `OK`.
+Options du serveur :
+
+| Option | Rôle |
+|---|---|
+| `--port N` (ou `--port=N`) | port d'écoute, 8796 par défaut (le suivant libre si occupé, 10 essais) |
+| `--local` | n'écouter que sur `127.0.0.1`, sans code d'appairage ; sinon réseau local et Tailscale, derrière l'appairage commun aux web tools |
+| `--sans-navigateur` | ne pas ouvrir le navigateur |
+| `--sans-pause` | acceptée pour le launcher (la pause de fin vient de `lancer.bat` sous Windows) |
+| `--sans-maj` | ne pas chercher de mise à jour sur GitHub au démarrage |
+
+Sans `--sans-maj`, le serveur fait `git fetch` puis une avance rapide (`git merge --ff-only`) ; s'il s'est mis à jour, il sort avec le code 75 et `lancer.sh` reprend l'exécutable de la nouvelle version puis le relance.
+
+Tests : `cargo test` (options du catalogue, page servie, fichiers refusés, Host inconnu, méthodes d'écriture refusées, en-têtes). La CI GitHub les lance à chaque envoi.
 
 ## Fonctionnalités
 
@@ -48,16 +60,12 @@ La mémoire (expérience, classement, infirmerie) est gardée dans le navigateur
 |---|---|
 | `index.html` | Le simulateur complet. Les effectifs y sont intégrés. |
 | `squads/*.json` | Effectifs sources par club : nom, poste, titulaire, international, sources. |
-| `serveur.py`, `appairage.py` | Serveur pour web_launcher et le réseau local ; `appairage.py` est une copie de celui de web_suite. |
-| `tests/banc-serveur.py` | Banc du serveur : ce qu'il sert, ce qu'il refuse. |
-| `tests/audit.py` | Audit automatique : joue N matchs sans affichage et contrôle l'intégrité et le réalisme. |
+| `rust/rugby/` | Serveur pour web_launcher et le réseau local (Rust) ; sécurité réseau prise dans la caisse commune `web_tools_commun` (dépôt web_suite). |
+| `lancer.sh`, `lancer.bat`, `binaires.sh`, `binaires.cmd` | Obtiennent l'exécutable (compilé ou téléchargé) puis le lancent. |
 
-## Lancer l'audit
+## Audit du simulateur
 
-```bash
-pip install playwright && playwright install chromium
-python3 tests/audit.py 40
-```
+L'ancien audit (`tests/audit.py`, qui jouait N matchs dans Chromium par Playwright et contrôlait l'intégrité et le réalisme) a été retiré avec le Python. Il se retrouve dans l'historique : `git show 6611dda:tests/audit.py`.
 
 ## Limites connues
 
