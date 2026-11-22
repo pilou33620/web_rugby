@@ -88,10 +88,18 @@ La mémoire (expérience, classement, infirmerie) est gardée dans le navigateur
 | `rust/rugby/` | Serveur pour web_launcher et le réseau local (Rust) ; sécurité réseau prise dans la caisse commune `web_tools_commun` (dépôt web_suite). |
 | `demarrer_WEB_RUGBY.sh`, `demarrer_WEB_RUGBY.cmd`, `scripts/` | Obtiennent l'exécutable (compilé ou téléchargé) puis le lancent. |
 | `lancer.sh`, `lancer.bat` | Relais vers `demarrer_WEB_RUGBY`, pour web_launcher. |
+| `rust/audit/` | Audit du simulateur dans Chromium (outil de développement, voir plus bas). |
 
 ## Audit du simulateur
 
-Audit du simulateur (outil de développement, hors CI) : `tests/audit.py` joue N matchs dans Chromium par Playwright, sans serveur (il ouvre `index.html` directement), et contrôle l'intégrité de la grille, les règles et le réalisme des statistiques : `pip install playwright && python3 tests/audit.py 40`.
+Audit du simulateur (outil de développement) : la caisse `rust/audit` joue N matchs dans Chromium, piloté par le protocole DevTools (`headless_chrome`), sans serveur (elle ouvre `index.html` directement), et contrôle l'intégrité de la grille, les règles et le réalisme des statistiques. Elle affiche le bilan et sort en erreur s'il y a une violation ou une erreur dans la page. Depuis la racine du dépôt :
+
+```sh
+cargo run -p audit -- 40                       # 40 matchs (par défaut)
+CHROME=/chemin/vers/chrome cargo run -p audit -- 40
+```
+
+Sans `CHROME`, elle prend le Chromium de Playwright (`/opt/pw-browsers`) s'il existe, sinon `chrome` ou `chromium` dans le PATH. L'outil n'entre ni dans `bin/` ni dans les archives publiées, et `cargo build` à la racine ne compile que le serveur. La CI le compile et le fait tourner sur 3 matchs.
 
 ## Limites connues
 

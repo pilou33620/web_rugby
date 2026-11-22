@@ -1,12 +1,4 @@
-"""Audit automatique du simulateur : joue N matchs sans affichage et contrôle à chaque instant
-l'intégrité de la grille, les règles (passes en avant, exclus) et le réalisme des statistiques.
-
-Utilisation : pip install playwright && playwright install chromium
-              python3 tests/audit.py 40        (CHROME=/chemin/vers/chrome pour un navigateur existant)
-"""
-import json, os, sys
-from playwright.sync_api import sync_playwright
-JS = r"""() => {
+() => {
   const S = window.__sim; const ids=['TOU','UBB','MHR','RCT','SR','R92','ASM','SP','SF','AB','CO','LOU','USAP','RCV'];
   const A = {matches:0, ticks:0, viol:{}, hist:{}, sum:{}, ex:{}};
   const V = (k, ex) => { A.viol[k]=(A.viol[k]||0)+1; if(ex && !A.ex[k]) A.ex[k]=ex; };
@@ -65,11 +57,4 @@ JS = r"""() => {
   for(const k in A.sum) out.par_match[k] = +(A.sum[k]/A.matches).toFixed(2);
   for(const k in A.hist){ const v=A.hist[k].slice().sort((p,q)=>p-q); out.distrib[k] = {n:v.length, moy:+(v.reduce((p,q)=>p+q,0)/v.length).toFixed(1), med:v[v.length>>1], p95:v[Math.floor(v.length*.95)], max:v[v.length-1]}; }
   return out;
-}"""
-with sync_playwright() as p:
-    b = p.chromium.launch(**({"executable_path": os.environ["CHROME"]} if os.environ.get("CHROME") else {}), args=["--no-sandbox"])
-    pg = b.new_page(); errs=[]; pg.on("pageerror", lambda e: errs.append(str(e)))
-    pg.goto("file://" + os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "index.html"))); pg.wait_for_timeout(500)
-    r = pg.evaluate(JS.replace("%d", str(int(sys.argv[1]) if len(sys.argv) > 1 else 40)))
-    print(json.dumps(r, ensure_ascii=False, indent=1)); print("erreurs page:", errs)
-    b.close()
+}

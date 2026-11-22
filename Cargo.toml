@@ -1,6 +1,8 @@
 [workspace]
 resolver = "2"
-members = ["rust/rugby"]
+members = ["rust/rugby", "rust/audit"]
+# audit : outil de développement, compilé seulement sur demande (cargo run -p audit)
+default-members = ["rust/rugby"]
 
 [profile.release]
 opt-level = 3

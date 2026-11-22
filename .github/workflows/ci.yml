@@ -16,3 +16,15 @@ jobs:
       # le serveur : options du catalogue, page servie, fichiers refusés, Host, méthodes, en-têtes
       - name: Serveur (Rust)
         run: cargo test -p rugby
+
+      # l'audit du simulateur (outil de développement, caisse rust/audit) : compilé, puis joué sur
+      # 3 matchs dans le Chrome du runner s'il y en a un ; il sort en erreur à la moindre violation
+      - name: Audit du simulateur (Chromium, 3 matchs)
+        run: |
+          cargo build --locked -p audit
+          if command -v google-chrome >/dev/null || command -v chromium >/dev/null || command -v chromium-browser >/dev/null; then
+            cargo run --locked -q -p audit -- 3 | tail -3
+            exit "${PIPESTATUS[0]}"
+          else
+            echo "Pas de Chromium sur ce runner : audit compilé, non lancé."
+          fi

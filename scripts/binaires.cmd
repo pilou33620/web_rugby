@@ -11,6 +11,8 @@ where cargo >nul 2>nul
 if not errorlevel 1 (
   cargo build --release -p rugby --bins || exit /b 1
   copy /y target\release\*.exe bin\ >nul 2>nul
+  rem audit : outil de developpement, caisse rust/audit, jamais dans bin
+  if exist bin\audit.exe del /q bin\audit.exe
   exit /b 0
 )
 set ICI=
