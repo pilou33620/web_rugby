@@ -11,7 +11,7 @@ use std::sync::{Arc, OnceLock};
 use std::time::{Duration, Instant};
 
 use web_tools_commun::appairage::{self, Garde};
-use web_tools_commun::serveur::{decoder_url, Reponse, Requete, Serveur};
+use web_tools_commun::serveur::{decoder_chemin, Reponse, Requete, Serveur};
 
 pub const PORT: u16 = 8796;
 
@@ -45,7 +45,7 @@ fn servir(r: &mut Requete) -> Reponse {
         return Reponse::texte(501, "méthode non prise en charge");
     }
     // la page seule : ni .git/, ni les sources, ni les bancs
-    match decoder_url(r.chemin()).as_str() {
+    match decoder_chemin(r.chemin()).as_str() {
         "/" | "/index.html" => match std::fs::read(racine().join("index.html")) {
             Ok(o) => Reponse::new(200, "text/html; charset=utf-8", o),
             Err(_) => Reponse::texte(404, "introuvable"),
