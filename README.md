@@ -65,7 +65,7 @@ La mémoire (expérience, classement, infirmerie) est gardée dans le navigateur
 
 ## Audit du simulateur
 
-L'ancien audit (`tests/audit.py`, qui jouait N matchs dans Chromium par Playwright et contrôlait l'intégrité et le réalisme) a été retiré avec le Python. Il se retrouve dans l'historique : `git show 6611dda:tests/audit.py`.
+Audit du simulateur (outil de développement, hors CI) : `tests/audit.py` joue N matchs dans Chromium par Playwright, sans serveur (il ouvre `index.html` directement), et contrôle l'intégrité de la grille, les règles et le réalisme des statistiques : `pip install playwright && python3 tests/audit.py 40`.
 
 ## Limites connues
 
