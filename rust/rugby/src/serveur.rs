@@ -11,6 +11,7 @@ use std::sync::{Arc, OnceLock};
 use std::time::{Duration, Instant};
 
 use web_tools_commun::appairage::{self, Garde};
+use web_tools_commun::production;
 use web_tools_commun::serveur::{decoder_chemin, Reponse, Requete, Serveur};
 
 pub const PORT: u16 = 8796;
@@ -157,6 +158,10 @@ fn git(args: &[&str], delai: u64) -> Result<String, String> {
 
 /// Mise à jour par git (avance rapide seulement). Rend vrai si le code a changé.
 fn mise_a_jour() -> Result<bool, String> {
+    // copie de production (archive sans git ni sources) : mise à jour depuis la publication « binaires »
+    if production::est_copie_prod(racine()) {
+        return production::mettre_a_jour("https://github.com/pilou33620/web_rugby", "rugby", racine(), &|t| println!("[*] {t}"));
+    }
     // pas de git ou pas un dépôt : on démarre sans rien dire
     if git(&["rev-parse", "--is-inside-work-tree"], 5).is_err() {
         return Ok(false);
@@ -209,7 +214,7 @@ pub fn main() {
         println!("{USAGE}");
         return;
     }
-    // --sans-pause : acceptée sans effet, la pause de fin vient de lancer.bat sous Windows
+    // --sans-pause : acceptée sans effet, demarrer_WEB_RUGBY.cmd garde la fenêtre ouverte sur une erreur sous Windows
     let _ = std::env::set_current_dir(racine());
     if !args.sans_maj {
         match mise_a_jour() {

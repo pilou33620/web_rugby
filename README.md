@@ -4,10 +4,35 @@ Simulateur de rugby autonome du Top 14 (saison 2026-2027), avec un rendu en hexa
 
 Tout tient dans un seul fichier : `index.html` (HTML, CSS et JavaScript, sans dépendance). Il suffit de l'ouvrir dans un navigateur.
 
+## Installation
+
+### Le plus simple : l'archive de production (sans git, sans rien installer)
+
+Dans la [publication « binaires »](https://github.com/pilou33620/web_rugby/releases/tag/binaires), prendre l'archive du système :
+
+| Système | Archive |
+|---|---|
+| Windows | `rugby-prod-windows-x86_64.zip` |
+| Linux x86_64 | `rugby-prod-linux-x86_64.tar.gz` |
+| Raspberry Pi (64 bits) | `rugby-prod-linux-aarch64.tar.gz` |
+| macOS (Apple) | `rugby-prod-macos-aarch64.tar.gz` |
+
+La décompresser où l'on veut (elle donne un dossier `rugby/` : le serveur dans `bin/`, `index.html`, les scripts de démarrage), puis double-cliquer sur `demarrer_WEB_RUGBY.cmd` (Windows) ou lancer `./demarrer_WEB_RUGBY.sh`. À chaque démarrage, le serveur compare son archive à la dernière publiée ; si elle a changé, il la télécharge (empreinte SHA-256 vérifiée), recopie ses fichiers par-dessus et redémarre. La saison vit dans le navigateur : une mise à jour ne la touche pas.
+
+### Pour développer : le dépôt git
+
+```bash
+git clone https://github.com/pilou33620/web_rugby.git
+cd web_rugby
+./demarrer_WEB_RUGBY.sh             # Windows : demarrer_WEB_RUGBY.cmd
+```
+
+`demarrer_WEB_RUGBY` obtient d'abord le serveur (`scripts/binaires.sh`, `scripts/binaires.cmd`) : sans `cargo`, il télécharge l'exécutable du système (publication GitHub « binaires », compilée par la CI à chaque envoi sur `main`, vérifiée par son empreinte SHA-256) dans `bin/` ; avec `cargo`, il est compilé sur place. À la racine, seul le lanceur du système en cours reste visible : le premier lancement masque l'autre. Sur une erreur, la fenêtre reste ouverte avec la raison. `lancer.sh` et `lancer.bat` restent, pour web_launcher : ils relaient vers `demarrer_WEB_RUGBY` avec les mêmes options.
+
 ## Lancer
 
 - **Par web_launcher** : carte Rugby Top 14 (port 8796). Depuis un autre appareil, ouvrez l'adresse par l'IP du Pi ; le code d'appairage demandé une fois s'affiche sur la carte, et HTTPS demande d'installer la CA (`/appairage/ca.pem`).
-- **Avec le serveur** : `./lancer.sh` (Linux, macOS, Raspberry Pi) ou `lancer.bat` (Windows). Le serveur est en Rust ; Rust n'est pas nécessaire : sans `cargo`, `binaires.sh` / `binaires.cmd` téléchargent l'exécutable du système (publication GitHub « binaires », compilée par la CI à chaque envoi sur `main`, vérifiée par son empreinte SHA-256) dans `bin/`. Avec `cargo`, il est compilé sur place. Le serveur ne sert que `index.html` et ne stocke rien.
+- **Avec le serveur** : `./demarrer_WEB_RUGBY.sh` (Linux, macOS, Raspberry Pi) ou `demarrer_WEB_RUGBY.cmd` (Windows), voir [Installation](#installation). Le serveur est en Rust ; Rust n'est pas nécessaire. Il ne sert que `index.html` et ne stocke rien.
 - **Localement** : ouvrez `index.html` dans un navigateur.
 
 Options du serveur :
@@ -17,10 +42,10 @@ Options du serveur :
 | `--port N` (ou `--port=N`) | port d'écoute, 8796 par défaut (le suivant libre si occupé, 10 essais) |
 | `--local` | n'écouter que sur `127.0.0.1`, sans code d'appairage ; sinon réseau local et Tailscale, derrière l'appairage commun aux web tools |
 | `--sans-navigateur` | ne pas ouvrir le navigateur |
-| `--sans-pause` | acceptée pour le launcher (la pause de fin vient de `lancer.bat` sous Windows) |
+| `--sans-pause` | acceptée pour le launcher (sous Windows, `demarrer_WEB_RUGBY.cmd` garde la fenêtre ouverte sur une erreur) |
 | `--sans-maj` | ne pas chercher de mise à jour sur GitHub au démarrage |
 
-Sans `--sans-maj`, le serveur fait `git fetch` puis une avance rapide (`git merge --ff-only`) ; s'il s'est mis à jour, il sort avec le code 75 et `lancer.sh` reprend l'exécutable de la nouvelle version puis le relance.
+Sans `--sans-maj`, le serveur met à jour un clone git par `git fetch` puis une avance rapide (`git merge --ff-only`), une archive de production par la publication « binaires » ; s'il s'est mis à jour, il sort avec le code 75 et `demarrer_WEB_RUGBY` reprend l'exécutable de la nouvelle version puis le relance.
 
 Tests : `cargo test` (options du catalogue, page servie, fichiers refusés, Host inconnu, méthodes d'écriture refusées, en-têtes). La CI GitHub les lance à chaque envoi.
 
@@ -61,7 +86,8 @@ La mémoire (expérience, classement, infirmerie) est gardée dans le navigateur
 | `index.html` | Le simulateur complet. Les effectifs y sont intégrés. |
 | `squads/*.json` | Effectifs sources par club : nom, poste, titulaire, international, sources. |
 | `rust/rugby/` | Serveur pour web_launcher et le réseau local (Rust) ; sécurité réseau prise dans la caisse commune `web_tools_commun` (dépôt web_suite). |
-| `lancer.sh`, `lancer.bat`, `binaires.sh`, `binaires.cmd` | Obtiennent l'exécutable (compilé ou téléchargé) puis le lancent. |
+| `demarrer_WEB_RUGBY.sh`, `demarrer_WEB_RUGBY.cmd`, `scripts/` | Obtiennent l'exécutable (compilé ou téléchargé) puis le lancent. |
+| `lancer.sh`, `lancer.bat` | Relais vers `demarrer_WEB_RUGBY`, pour web_launcher. |
 
 ## Audit du simulateur
 
